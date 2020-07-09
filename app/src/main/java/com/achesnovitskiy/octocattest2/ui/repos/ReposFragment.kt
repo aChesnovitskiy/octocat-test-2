@@ -78,7 +78,8 @@ class ReposFragment : Fragment(R.layout.fragment_repos) {
                     Observer { repos ->
                         repos_list_is_empty_text_view.visibility =
                             if (repos.isNullOrEmpty()) View.VISIBLE else View.GONE
-                        reposAdapter.updateRepos(repos)
+
+                        reposAdapter.submitList(repos)
                     }
                 )
             }
