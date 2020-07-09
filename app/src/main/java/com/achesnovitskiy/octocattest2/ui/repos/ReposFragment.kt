@@ -2,6 +2,7 @@ package com.achesnovitskiy.octocattest2.ui.repos
 
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
@@ -89,29 +90,15 @@ class ReposFragment : Fragment(R.layout.fragment_repos) {
         val divider = DividerItemDecoration(context, DividerItemDecoration.VERTICAL)
 
         with(repos_recycler_view) {
-            // Get overscroll
-//            val linearLayoutManager: LinearLayoutManager =
-//                object : LinearLayoutManager(this@ReposFragment.context) {
-//                    override fun scrollVerticallyBy(
-//                        dy: Int,
-//                        recycler: Recycler,
-//                        state: RecyclerView.State
-//                    ): Int {
-//                        val scrollRange = super.scrollVerticallyBy(dy, recycler, state)
-//                        val overScroll = dy - scrollRange
-//                        if (overScroll > 0) {
-//                            Log.d("My_", "Bottom overscroll")
-//                        } else if (overScroll < 0) {
-//                            Log.d("My_", "Top overscroll")
-//                            reposViewModel.updateRepos(USER_OCTOCAT)
-//                        }
-//                        return scrollRange
-//                    }
-//                }
-
             adapter = reposAdapter
             layoutManager = LinearLayoutManager(context)
             addItemDecoration(divider)
+        }
+
+        repos_swipe_refresh_layout.setOnRefreshListener {
+            Log.d("My_ReposFragment", "Refresh")
+
+            repos_swipe_refresh_layout.isRefreshing = false
         }
     }
 

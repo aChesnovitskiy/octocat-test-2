@@ -33,11 +33,18 @@
             android:text="@string/list_is_empty"
             android:textSize="@dimen/font_size_large_18" />
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/repos_recycler_view"
+        <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+            android:id="@+id/repos_swipe_refresh_layout"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            tools:listitem="@layout/item_repo" />
+            android:layout_height="wrap_content" >
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/repos_recycler_view"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                tools:listitem="@layout/item_repo" />
+
+        </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
         <androidx.core.widget.ContentLoadingProgressBar
             android:id="@+id/repos_progress_bar"
