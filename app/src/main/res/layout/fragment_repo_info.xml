@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/white"
+    android:orientation="vertical"
+    tools:context=".ui.repoinfo.RepoInfoFragment">
+
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/repo_info_toolbar"
+        style="@style/ToolbarLightStyle"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:theme="@style/ToolbarLightTheme" />
+
+    <TextView
+        android:id="@+id/repo_name_text_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:textSize="@dimen/font_size_huge_22"
+        tools:text="Repo name" />
+
+</FrameLayout>
