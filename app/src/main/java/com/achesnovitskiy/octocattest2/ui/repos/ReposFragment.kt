@@ -13,37 +13,32 @@ import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
-import androidx.recyclerview.widget.RecyclerView.Recycler
 import com.achesnovitskiy.octocattest2.R
 import com.achesnovitskiy.octocattest2.data.Repo
 import com.achesnovitskiy.octocattest2.viewmodels.repos.ReposViewModel
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.fragment_repos.*
-import rx.subjects.BehaviorSubject
 
 class ReposFragment : Fragment(R.layout.fragment_repos) {
 
     private val reposViewModel: ReposViewModel by viewModels()
 
     private val reposAdapter: ReposAdapter by lazy {
-        ReposAdapter { repo ->
-            navigateToInfo(repo)
-        }
+        ReposAdapter { repo -> navigateToInfo(repo) }
     }
+
+    private val compositeDisposable = CompositeDisposable()
 
 //    private val binding: ReposBinding by lazy { ReposBinding() }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
 
-        setupToolbar()
         setupProgressBar()
         setupViewModel()
         setupRecyclerView()
-    }
-
-    private fun setupToolbar() {
-//        (activity as AppCompatActivity).setSupportActionBar(repos_toolbar)
     }
 
     private fun setupProgressBar() {
@@ -74,16 +69,28 @@ class ReposFragment : Fragment(R.layout.fragment_repos) {
 //                    }
 //                )
 
-                getRepos(USER_OCTOCAT).observe(
-                    viewLifecycleOwner,
-                    Observer { repos ->
-                        repos_list_is_empty_text_view.visibility =
-                            if (repos.isNullOrEmpty()) View.VISIBLE else View.GONE
+            repos.subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe { repos ->
+                    repos_list_is_empty_text_view.visibility =
+                        if (repos.isNullOrEmpty()) View.VISIBLE else View.GONE
 
-                        reposAdapter.submitList(repos)
-                    }
-                )
-            }
+                    reposAdapter.submitList(repos)
+                }
+                .let { compositeDisposable.add(it) }
+
+            onReposRequest(USER_OCTOCAT)
+
+//                getRepos(USER_OCTOCAT).observe(
+//                    viewLifecycleOwner,
+//                    Observer { repos ->
+//                        repos_list_is_empty_text_view.visibility =
+//                            if (repos.isNullOrEmpty()) View.VISIBLE else View.GONE
+//
+//                        reposAdapter.submitList(repos)
+//                    }
+//                )
+        }
     }
 
     private fun setupRecyclerView() {
@@ -91,7 +98,9 @@ class ReposFragment : Fragment(R.layout.fragment_repos) {
 
         with(repos_recycler_view) {
             adapter = reposAdapter
+
             layoutManager = LinearLayoutManager(context)
+
             addItemDecoration(divider)
         }
 
@@ -108,6 +117,12 @@ class ReposFragment : Fragment(R.layout.fragment_repos) {
                 ReposFragmentDirections
                     .actionRepositoriesFragmentToRepoInfoFragment(repo.name)
             )
+    }
+
+    override fun onStop() {
+        compositeDisposable.dispose()
+
+        super.onStop()
     }
 
     companion object {

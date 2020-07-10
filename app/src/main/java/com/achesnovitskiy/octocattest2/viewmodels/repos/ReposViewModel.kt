@@ -7,48 +7,48 @@ import androidx.lifecycle.ViewModel
 import com.achesnovitskiy.octocattest2.data.Repo
 import com.achesnovitskiy.octocattest2.repositories.Repository
 import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
+import io.reactivex.subjects.BehaviorSubject
 
 class ReposViewModel : ViewModel() {
+
+    val repos: BehaviorSubject<List<Repo>> = BehaviorSubject.create()
+
+    private val compositeDisposable = CompositeDisposable()
 
     private val state = MutableLiveData<ReposState>().apply {
         value = ReposState()
     }
-    private val repos = MutableLiveData<List<Repo>>(listOf())
 
-    fun getState(): LiveData<ReposState> = state
-
-    fun getRepos(userName: String): LiveData<List<Repo>> {
-        loadReposFromApi(userName)
-
-        val result = MediatorLiveData<List<Repo>>()
-
-        val filterF = {
-            val query = state.value?.searchQuery ?: ""
-            val repos = repos.value!!
-
-            result.value = if (query.isEmpty()) repos
-            else repos.filter { it.name.contains(query, true) }
-        }
-
-        result.addSource(repos) { filterF.invoke() }
-        result.addSource(state) { filterF.invoke() }
-
-        return result
-    }
-
-    private fun loadReposFromApi(userName: String) {
+    fun onReposRequest(userName: String) {
         Repository.loadReposFromApi(userName)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe { reposFromApi ->
-                repos.value = reposFromApi
+                repos.onNext(reposFromApi)
             }
+            .let { compositeDisposable.add(it) }
     }
 
-    fun updateRepos(userName: String) {
-        updateState { it.copy(isLoading = true) }
-        loadReposFromApi(userName)
+    fun getState(): LiveData<ReposState> = state
+
+    fun getRepos(userName: String): LiveData<List<Repo>> {
+
+        val result = MediatorLiveData<List<Repo>>()
+
+//        val filterF = {
+//            val query = state.value?.searchQuery ?: ""
+//            val repos = repos1.value!!
+//
+//            result.value = if (query.isEmpty()) repos
+//            else repos.filter { it.name.contains(query, true) }
+//        }
+//
+//        result.addSource(repos1) { filterF.invoke() }
+//        result.addSource(state) { filterF.invoke() }
+
+        return result
     }
 
     fun handleSearchQuery(query: String?) {
@@ -63,6 +63,10 @@ class ReposViewModel : ViewModel() {
     private fun updateState(update: (currentState: ReposState) -> ReposState) {
         val updatedState = update(state.value!!)
         state.value = updatedState
+    }
+
+    override fun onCleared() {
+        compositeDisposable.dispose()
     }
 }
 
