@@ -9,16 +9,17 @@ import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.DrawableCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.achesnovitskiy.octocattest2.R
 import com.achesnovitskiy.octocattest2.data.Repo
+import com.achesnovitskiy.octocattest2.viewmodels.repos.ReposState
 import com.achesnovitskiy.octocattest2.viewmodels.repos.ReposViewModel
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
+import io.reactivex.subjects.BehaviorSubject
 import kotlinx.android.synthetic.main.fragment_repos.*
 
 class ReposFragment : Fragment(R.layout.fragment_repos) {
@@ -29,9 +30,9 @@ class ReposFragment : Fragment(R.layout.fragment_repos) {
         ReposAdapter { repo -> navigateToInfo(repo) }
     }
 
-    private val compositeDisposable = CompositeDisposable()
+    private val binding: ReposBinding by lazy { ReposBinding() }
 
-//    private val binding: ReposBinding by lazy { ReposBinding() }
+    private val compositeDisposable = CompositeDisposable()
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
@@ -55,21 +56,23 @@ class ReposFragment : Fragment(R.layout.fragment_repos) {
             repos_progress_bar.indeterminateDrawable = DrawableCompat.unwrap(drawableProgress)
         }
 
-//        binding.isLoading.subscribe { isLoading ->
-//            repos_progress_bar.visibility = if (isLoading) View.VISIBLE else View.GONE
-//        }
+        binding.isLoading
+            .subscribe { isLoading ->
+                repos_progress_bar.visibility = if (isLoading) View.VISIBLE else View.GONE
+            }
+            .let { compositeDisposable.add(it) }
     }
 
     private fun setupViewModel() {
         reposViewModel.apply {
-//                getState().observe(
-//                    viewLifecycleOwner,
-//                    Observer { state ->
-//                        binding.bind(state)
-//                    }
-//                )
+            state
+                .subscribe { state ->
+                    binding.bind(state)
+                }
+                .let { compositeDisposable.add(it) }
 
-            repos.subscribeOn(Schedulers.io())
+            repos
+                .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe { repos ->
                     repos_list_is_empty_text_view.visibility =
@@ -79,17 +82,7 @@ class ReposFragment : Fragment(R.layout.fragment_repos) {
                 }
                 .let { compositeDisposable.add(it) }
 
-            onReposRequest(USER_OCTOCAT)
-
-//                getRepos(USER_OCTOCAT).observe(
-//                    viewLifecycleOwner,
-//                    Observer { repos ->
-//                        repos_list_is_empty_text_view.visibility =
-//                            if (repos.isNullOrEmpty()) View.VISIBLE else View.GONE
-//
-//                        reposAdapter.submitList(repos)
-//                    }
-//                )
+            onRequestReposFromApi(USER_OCTOCAT)
         }
     }
 
@@ -129,15 +122,15 @@ class ReposFragment : Fragment(R.layout.fragment_repos) {
         const val USER_OCTOCAT = "octocat"
     }
 
-//    inner class ReposBinding {
-//        var searchQuery: String? = null
-//        var isSearch: Boolean = false
-//        var isLoading: BehaviorSubject<Boolean> = BehaviorSubject.create(false)
-//
-//        fun bind(state: ReposState) {
-//            isSearch = state.isSearch
-//            searchQuery = state.searchQuery
-//            isLoading.onNext(state.isLoading)
-//        }
-//    }
+    inner class ReposBinding {
+        var searchQuery: String? = null
+        var isSearch: Boolean = false
+        var isLoading: BehaviorSubject<Boolean> = BehaviorSubject.createDefault(false)
+
+        fun bind(state: ReposState) {
+            isSearch = state.isSearch
+            searchQuery = state.searchQuery
+            isLoading.onNext(state.isLoading)
+        }
+    }
 }

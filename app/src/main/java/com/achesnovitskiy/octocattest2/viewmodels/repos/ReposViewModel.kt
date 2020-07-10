@@ -15,23 +15,29 @@ class ReposViewModel : ViewModel() {
 
     val repos: BehaviorSubject<List<Repo>> = BehaviorSubject.create()
 
+    val state: BehaviorSubject<ReposState> = BehaviorSubject.createDefault(
+        ReposState(
+            isSearch =  false,
+            searchQuery =  "",
+            isLoading =  false
+        )
+    )
+
     private val compositeDisposable = CompositeDisposable()
 
-    private val state = MutableLiveData<ReposState>().apply {
-        value = ReposState()
-    }
+    fun onRequestReposFromApi(userName: String) {
+        updateState { it.copy(isLoading = true) }
 
-    fun onReposRequest(userName: String) {
         Repository.loadReposFromApi(userName)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe { reposFromApi ->
                 repos.onNext(reposFromApi)
+                updateState { it.copy(isLoading = false) }
             }
             .let { compositeDisposable.add(it) }
     }
 
-    fun getState(): LiveData<ReposState> = state
 
     fun getRepos(userName: String): LiveData<List<Repo>> {
 
@@ -62,7 +68,8 @@ class ReposViewModel : ViewModel() {
 
     private fun updateState(update: (currentState: ReposState) -> ReposState) {
         val updatedState = update(state.value!!)
-        state.value = updatedState
+
+        state.onNext(updatedState)
     }
 
     override fun onCleared() {
@@ -71,7 +78,7 @@ class ReposViewModel : ViewModel() {
 }
 
 data class ReposState(
-    val isSearch: Boolean = false,
-    val searchQuery: String? = null,
-    val isLoading: Boolean = true
+    val isSearch: Boolean,
+    val searchQuery: String,
+    val isLoading: Boolean
 )
