@@ -43,8 +43,7 @@ class RepoInfoFragment : Fragment(R.layout.fragment_repo_info) {
         repoInfoViewModel.apply {
             onGetRepoNameFromArgs(repoNameFromArgs)
 
-            disposable = repoName
-                .subscribe { repoName ->
+            disposable = repoName.subscribe { repoName ->
                     repo_name_text_view.text = repoName
                 }
         }

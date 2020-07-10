@@ -5,7 +5,7 @@ import io.reactivex.subjects.BehaviorSubject
 
 class RepoInfoViewModel : ViewModel() {
 
-    var repoName: BehaviorSubject<String> = BehaviorSubject.create()
+    val repoName: BehaviorSubject<String> = BehaviorSubject.create()
 
     fun onGetRepoNameFromArgs(repoNameFromArgs: String) {
         repoName.onNext(repoNameFromArgs)
