@@ -20,12 +20,12 @@ class RepoInfoFragment : Fragment(R.layout.fragment_repo_info) {
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
 
-        setupToolbar()
+        setupBackButton()
         setupViewModel()
     }
 
-    private fun setupToolbar() {
-        repo_info_back_image_button.setOnClickListener {
+    private fun setupBackButton() {
+        repo_info_back_button.setOnClickListener {
             (activity as AppCompatActivity).onBackPressed()
         }
     }
@@ -42,6 +42,7 @@ class RepoInfoFragment : Fragment(R.layout.fragment_repo_info) {
 
     override fun onStop() {
         disposable.dispose()
+
         super.onStop()
     }
 }
