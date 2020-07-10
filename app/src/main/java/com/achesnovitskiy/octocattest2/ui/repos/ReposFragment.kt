@@ -43,7 +43,7 @@ class ReposFragment : Fragment(R.layout.fragment_repos) {
     }
 
     private fun setupToolbar() {
-        (activity as AppCompatActivity).setSupportActionBar(repos_toolbar)
+//        (activity as AppCompatActivity).setSupportActionBar(repos_toolbar)
     }
 
     private fun setupProgressBar() {

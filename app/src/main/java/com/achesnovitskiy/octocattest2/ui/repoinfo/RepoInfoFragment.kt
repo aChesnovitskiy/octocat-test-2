@@ -25,17 +25,8 @@ class RepoInfoFragment : Fragment(R.layout.fragment_repo_info) {
     }
 
     private fun setupToolbar() {
-        (activity as AppCompatActivity).apply {
-            setSupportActionBar(repo_info_toolbar)
-
-            supportActionBar?.apply {
-                setDisplayShowTitleEnabled(false)
-                setDisplayHomeAsUpEnabled(true)
-            }
-
-            repo_info_toolbar.setNavigationOnClickListener {
-                this.onBackPressed()
-            }
+        repo_info_back_image_button.setOnClickListener {
+            (activity as AppCompatActivity).onBackPressed()
         }
     }
 

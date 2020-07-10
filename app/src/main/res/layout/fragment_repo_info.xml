@@ -7,12 +7,21 @@
     android:orientation="vertical"
     tools:context=".ui.repoinfo.RepoInfoFragment">
 
-    <com.google.android.material.appbar.MaterialToolbar
-        android:id="@+id/repo_info_toolbar"
-        style="@style/ToolbarLightStyle"
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
-        android:theme="@style/ToolbarLightTheme" />
+        android:layout_height="?attr/actionBarSize">
+
+        <ImageButton
+            android:id="@+id/repo_info_back_image_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center|start"
+            android:layout_marginStart="@dimen/spacing_normal_16"
+            android:background="@drawable/background_ripple"
+            android:src="@drawable/ic_back_black_24"
+            android:contentDescription="@string/back_button" />
+
+    </FrameLayout>
 
     <TextView
         android:id="@+id/repo_name_text_view"

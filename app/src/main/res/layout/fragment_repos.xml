@@ -1,25 +1,34 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.appcompat.widget.LinearLayoutCompat xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
     tools:context=".ui.repos.ReposFragment">
 
-    <com.google.android.material.appbar.AppBarLayout
-        android:id="@+id/repos_appbar"
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="?attr/actionBarSize"
+        android:background="@color/color_primary">
 
-        <com.google.android.material.appbar.MaterialToolbar
-            android:id="@+id/repos_toolbar"
-            style="@style/ToolbarDarkStyle"
-            android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
-            app:title="@string/app_name" />
+        <TextView
+            style="@style/ToolbarTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center|start"
+            android:layout_marginStart="@dimen/spacing_normal_16"
+            android:text="@string/app_name" />
 
-    </com.google.android.material.appbar.AppBarLayout>
+        <ImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center|end"
+            android:layout_marginEnd="@dimen/spacing_normal_16"
+            android:background="@drawable/background_ripple"
+            android:src="@drawable/ic_search_white_24"
+            android:contentDescription="@string/search_button" />
+
+    </FrameLayout>
 
     <FrameLayout
         android:layout_width="match_parent"
@@ -36,7 +45,7 @@
         <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
             android:id="@+id/repos_swipe_refresh_layout"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" >
+            android:layout_height="wrap_content">
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/repos_recycler_view"
