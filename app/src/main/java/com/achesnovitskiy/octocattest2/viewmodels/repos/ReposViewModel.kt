@@ -1,8 +1,5 @@
 package com.achesnovitskiy.octocattest2.viewmodels.repos
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MediatorLiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.achesnovitskiy.octocattest2.data.Repo
 import com.achesnovitskiy.octocattest2.repositories.Repository
@@ -25,7 +22,7 @@ class ReposViewModel : ViewModel() {
 
     private val compositeDisposable = CompositeDisposable()
 
-    fun onRequestReposFromApi(userName: String) {
+    fun onReposFromApiRequest(userName: String) {
         updateState { it.copy(isLoading = true) }
 
         Repository.loadReposFromApi(userName)
@@ -33,36 +30,17 @@ class ReposViewModel : ViewModel() {
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe { reposFromApi ->
                 repos.onNext(reposFromApi)
+
                 updateState { it.copy(isLoading = false) }
             }
             .let { compositeDisposable.add(it) }
     }
-
-
-    fun getRepos(userName: String): LiveData<List<Repo>> {
-
-        val result = MediatorLiveData<List<Repo>>()
-
-//        val filterF = {
-//            val query = state.value?.searchQuery ?: ""
-//            val repos = repos1.value!!
-//
-//            result.value = if (query.isEmpty()) repos
-//            else repos.filter { it.name.contains(query, true) }
-//        }
-//
-//        result.addSource(repos1) { filterF.invoke() }
-//        result.addSource(state) { filterF.invoke() }
-
-        return result
-    }
-
     fun handleSearchQuery(query: String?) {
         query ?: return
         updateState { it.copy(searchQuery = query) }
     }
 
-    fun handleSearchMode(isSearch: Boolean) {
+    fun onSearchModeRequest(isSearch: Boolean) {
         updateState { it.copy(isSearch = isSearch) }
     }
 

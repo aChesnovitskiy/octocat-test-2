@@ -4,8 +4,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:focusable="true"
-    android:focusableInTouchMode="true"
     tools:context=".ui.repos.ReposFragment">
 
     <FrameLayout
@@ -14,6 +12,7 @@
         android:background="@color/color_primary">
 
         <TextView
+            android:id="@+id/repos_title"
             style="@style/ToolbarTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -32,7 +31,7 @@
             android:src="@drawable/ic_search_white_24" />
 
         <LinearLayout
-            android:id="@+id/search_layout"
+            android:id="@+id/repos_search_layout"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_marginHorizontal="@dimen/spacing_normal_16"
@@ -70,7 +69,7 @@
                 android:layout_marginEnd="@dimen/spacing_normal_16"
                 android:background="@drawable/background_ripple"
                 android:contentDescription="@string/search_button"
-                android:src="@drawable/ic_close_black_24" />
+                android:src="@drawable/ic_close_24"/>
 
         </LinearLayout>
 
