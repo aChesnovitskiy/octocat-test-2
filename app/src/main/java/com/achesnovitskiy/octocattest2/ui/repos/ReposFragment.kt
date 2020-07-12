@@ -17,6 +17,7 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.achesnovitskiy.octocattest2.R
 import com.achesnovitskiy.octocattest2.data.Repo
+import com.achesnovitskiy.octocattest2.viewmodels.repos.ReposState
 import com.achesnovitskiy.octocattest2.viewmodels.repos.ReposViewModel
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
@@ -40,6 +41,8 @@ class ReposFragment : Fragment(R.layout.fragment_repos) {
         setupSearchView()
         setupRecyclerView()
         setupViewModel()
+
+        reposViewModel.onReposFromApiRequest(USER_OCTOCAT)
     }
 
     private fun setupProgressBar() {
@@ -71,8 +74,10 @@ class ReposFragment : Fragment(R.layout.fragment_repos) {
         }
 
         repos_search_edit_text.addTextChangedListener(object : TextWatcher {
-            override fun afterTextChanged(s: Editable?) {
-                repos_search_close_button.isEnabled = !s.isNullOrEmpty()
+            override fun afterTextChanged(text: Editable?) {
+                repos_search_close_button.isEnabled = !text.isNullOrEmpty()
+
+                reposViewModel.onSearchQuery(text.toString())
             }
 
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
@@ -107,33 +112,11 @@ class ReposFragment : Fragment(R.layout.fragment_repos) {
         reposViewModel.apply {
             state
                 .subscribe { state ->
-                    repos_progress_bar.visibility =
-                        if (state.isLoading) View.VISIBLE else View.GONE
-
-                    if (state.isSearch) {
-                        repos_search_layout.visibility = View.VISIBLE
-                        repos_search_button.visibility = View.GONE
-                        repos_title.visibility = View.GONE
-
-                        repos_search_edit_text.requestFocus()
-
-                        ((activity as AppCompatActivity)
-                            .getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager)
-                            .toggleSoftInput(
-                                InputMethodManager.SHOW_IMPLICIT,
-                                InputMethodManager.HIDE_IMPLICIT_ONLY
-                            )
-                    } else {
-                        repos_search_layout.visibility = View.GONE
-                        repos_search_button.visibility = View.VISIBLE
-                        repos_title.visibility = View.VISIBLE
-
-                        repos_search_edit_text.text = null
-                    }
+                    bindState(state)
                 }
                 .let { compositeDisposable.add(it) }
 
-            repos
+            reposWithSearch
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe { repos ->
@@ -143,8 +126,32 @@ class ReposFragment : Fragment(R.layout.fragment_repos) {
                     reposAdapter.submitList(repos)
                 }
                 .let { compositeDisposable.add(it) }
+        }
+    }
 
-            onReposFromApiRequest(USER_OCTOCAT)
+    private fun bindState(state: ReposState) {
+        repos_progress_bar.visibility =
+            if (state.isLoading) View.VISIBLE else View.GONE
+
+        if (state.isSearching) {
+            repos_search_layout.visibility = View.VISIBLE
+            repos_search_button.visibility = View.GONE
+            repos_title.visibility = View.GONE
+
+            repos_search_edit_text.requestFocus()
+
+            ((activity as AppCompatActivity)
+                .getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager)
+                .toggleSoftInput(
+                    InputMethodManager.SHOW_IMPLICIT,
+                    InputMethodManager.HIDE_IMPLICIT_ONLY
+                )
+        } else {
+            repos_search_layout.visibility = View.GONE
+            repos_search_button.visibility = View.VISIBLE
+            repos_title.visibility = View.VISIBLE
+
+            repos_search_edit_text.text = null
         }
     }
 

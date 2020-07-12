@@ -3,20 +3,34 @@ package com.achesnovitskiy.octocattest2.viewmodels.repos
 import androidx.lifecycle.ViewModel
 import com.achesnovitskiy.octocattest2.data.Repo
 import com.achesnovitskiy.octocattest2.repositories.Repository
+import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.functions.BiFunction
 import io.reactivex.schedulers.Schedulers
 import io.reactivex.subjects.BehaviorSubject
 
 class ReposViewModel : ViewModel() {
 
-    val repos: BehaviorSubject<List<Repo>> = BehaviorSubject.create()
+    private val repos: BehaviorSubject<List<Repo>> = BehaviorSubject.create()
+
+    private val searchQuery: BehaviorSubject<String> = BehaviorSubject.create()
+
+    val reposWithSearch: Observable<List<Repo>> = Observable
+        .combineLatest(
+            repos,
+            searchQuery,
+            BiFunction { repos: List<Repo>, searchQuery: String ->
+                repos.filter { repo ->
+                    repo.name.contains(searchQuery, true)
+                }
+            }
+    )
 
     val state: BehaviorSubject<ReposState> = BehaviorSubject.createDefault(
         ReposState(
-            isSearch =  false,
-            searchQuery =  "",
-            isLoading =  false
+            isSearching = false,
+            isLoading = false
         )
     )
 
@@ -35,13 +49,13 @@ class ReposViewModel : ViewModel() {
             }
             .let { compositeDisposable.add(it) }
     }
-    fun handleSearchQuery(query: String?) {
-        query ?: return
-        updateState { it.copy(searchQuery = query) }
+
+    fun onSearchQuery(query: String?) {
+        searchQuery.onNext(query ?: "")
     }
 
     fun onSearchModeRequest(isSearch: Boolean) {
-        updateState { it.copy(isSearch = isSearch) }
+        updateState { it.copy(isSearching = isSearch) }
     }
 
     private fun updateState(update: (currentState: ReposState) -> ReposState) {
@@ -56,7 +70,6 @@ class ReposViewModel : ViewModel() {
 }
 
 data class ReposState(
-    val isSearch: Boolean,
-    val searchQuery: String,
+    val isSearching: Boolean,
     val isLoading: Boolean
 )
