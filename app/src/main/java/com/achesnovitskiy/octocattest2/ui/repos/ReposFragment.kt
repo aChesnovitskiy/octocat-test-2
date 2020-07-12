@@ -32,6 +32,8 @@ class ReposFragment : Fragment(R.layout.fragment_repos) {
         ReposAdapter { repo -> navigateToInfo(repo) }
     }
 
+    private var isReposLoaded = false
+
     private val compositeDisposable = CompositeDisposable()
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
@@ -42,7 +44,11 @@ class ReposFragment : Fragment(R.layout.fragment_repos) {
         setupRecyclerView()
         setupViewModel()
 
-        reposViewModel.onReposFromApiRequest(USER_OCTOCAT)
+        if (!isReposLoaded) {
+            reposViewModel.onReposFromApiRequest(USER_OCTOCAT)
+
+            isReposLoaded = true
+        }
     }
 
     private fun setupProgressBar() {
