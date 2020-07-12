@@ -28,7 +28,7 @@ class ReposFragment : Fragment(R.layout.fragment_repos) {
 
     private val reposViewModel: ReposViewModel by viewModels()
 
-    private val reposAdapter: ReposAdapter by lazy {
+    private val reposAdapter: ReposAdapter by lazy(LazyThreadSafetyMode.NONE) {
         ReposAdapter { repo -> navigateToInfo(repo) }
     }
 

@@ -13,7 +13,9 @@ class RepoInfoFragment : Fragment(R.layout.fragment_repo_info) {
 
     private val repoInfoViewModel: RepoInfoViewModel by viewModels()
 
-    private val repoNameFromArgs: String by lazy { arguments?.get("repo_name") as String }
+    private val repoNameFromArgs: String by lazy(LazyThreadSafetyMode.NONE) {
+        arguments?.get("repo_name") as String
+    }
 
     private lateinit var disposable: Disposable
 
@@ -35,8 +37,8 @@ class RepoInfoFragment : Fragment(R.layout.fragment_repo_info) {
             onGetRepoNameFromArgs(repoNameFromArgs)
 
             disposable = repoName.subscribe { repoName ->
-                    repo_name_text_view.text = repoName
-                }
+                repo_name_text_view.text = repoName
+            }
         }
     }
 
