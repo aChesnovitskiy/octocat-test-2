@@ -1,6 +1,7 @@
 package com.achesnovitskiy.octocattest2.viewmodels.repos
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import com.achesnovitskiy.octocattest2.data.Repo
 import com.achesnovitskiy.octocattest2.repositories.Repository
 import io.reactivex.Observable
@@ -10,11 +11,13 @@ import io.reactivex.functions.BiFunction
 import io.reactivex.schedulers.Schedulers
 import io.reactivex.subjects.BehaviorSubject
 
-class ReposViewModel : ViewModel() {
+class ReposViewModel(initialUserName: String) : ViewModel() {
 
     private val repos: BehaviorSubject<List<Repo>> = BehaviorSubject.create()
 
     private val searchQuery: BehaviorSubject<String> = BehaviorSubject.create()
+
+    private val compositeDisposable = CompositeDisposable()
 
     val reposWithSearch: Observable<List<Repo>> = Observable
         .combineLatest(
@@ -25,7 +28,7 @@ class ReposViewModel : ViewModel() {
                     repo.name.contains(searchQuery, true)
                 }
             }
-    )
+        )
 
     val state: BehaviorSubject<ReposState> = BehaviorSubject.createDefault(
         ReposState(
@@ -34,7 +37,9 @@ class ReposViewModel : ViewModel() {
         )
     )
 
-    private val compositeDisposable = CompositeDisposable()
+    init {
+        onReposFromApiRequest(initialUserName)
+    }
 
     fun onReposFromApiRequest(userName: String) {
         updateState { it.copy(isLoading = true) }
@@ -73,3 +78,11 @@ data class ReposState(
     val isSearching: Boolean,
     val isLoading: Boolean
 )
+
+@Suppress("UNCHECKED_CAST")
+class ReposViewModelFactory(private val initialUserName: String) :
+    ViewModelProvider.NewInstanceFactory() {
+
+    override fun <T : ViewModel?> create(modelClass: Class<T>): T =
+        ReposViewModel(initialUserName) as T
+}

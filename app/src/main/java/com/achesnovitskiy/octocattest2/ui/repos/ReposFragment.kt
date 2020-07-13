@@ -19,6 +19,7 @@ import com.achesnovitskiy.octocattest2.R
 import com.achesnovitskiy.octocattest2.data.Repo
 import com.achesnovitskiy.octocattest2.viewmodels.repos.ReposState
 import com.achesnovitskiy.octocattest2.viewmodels.repos.ReposViewModel
+import com.achesnovitskiy.octocattest2.viewmodels.repos.ReposViewModelFactory
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
@@ -26,13 +27,11 @@ import kotlinx.android.synthetic.main.fragment_repos.*
 
 class ReposFragment : Fragment(R.layout.fragment_repos) {
 
-    private val reposViewModel: ReposViewModel by viewModels()
+    private val reposViewModel: ReposViewModel by viewModels { ReposViewModelFactory(USER_OCTOCAT) }
 
     private val reposAdapter: ReposAdapter by lazy(LazyThreadSafetyMode.NONE) {
         ReposAdapter { repo -> navigateToInfo(repo) }
     }
-
-    private var isReposLoaded = false
 
     private val compositeDisposable = CompositeDisposable()
 
@@ -43,12 +42,6 @@ class ReposFragment : Fragment(R.layout.fragment_repos) {
         setupSearchView()
         setupRecyclerView()
         setupViewModel()
-
-        if (!isReposLoaded) {
-            reposViewModel.onReposFromApiRequest(USER_OCTOCAT)
-
-            isReposLoaded = true
-        }
     }
 
     private fun setupProgressBar() {
