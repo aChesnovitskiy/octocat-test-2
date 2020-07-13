@@ -1,5 +1,6 @@
 package com.achesnovitskiy.octocattest2.ui.repos
 
+import android.app.Activity
 import android.content.Context.INPUT_METHOD_SERVICE
 import android.os.Build
 import android.os.Bundle
@@ -17,6 +18,8 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.achesnovitskiy.octocattest2.R
 import com.achesnovitskiy.octocattest2.data.Repo
+import com.achesnovitskiy.octocattest2.extensions.hideKeyboard
+import com.achesnovitskiy.octocattest2.extensions.showKeyboard
 import com.achesnovitskiy.octocattest2.viewmodels.repos.ReposState
 import com.achesnovitskiy.octocattest2.viewmodels.repos.ReposViewModel
 import com.achesnovitskiy.octocattest2.viewmodels.repos.ReposViewModelFactory
@@ -139,18 +142,15 @@ class ReposFragment : Fragment(R.layout.fragment_repos) {
 
             repos_search_edit_text.requestFocus()
 
-            ((activity as AppCompatActivity)
-                .getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager)
-                .toggleSoftInput(
-                    InputMethodManager.SHOW_IMPLICIT,
-                    InputMethodManager.HIDE_IMPLICIT_ONLY
-                )
+            (activity as AppCompatActivity).showKeyboard()
         } else {
             repos_search_layout.visibility = View.GONE
             repos_search_button.visibility = View.VISIBLE
             repos_title.visibility = View.VISIBLE
 
             repos_search_edit_text.text = null
+
+            (activity as AppCompatActivity).hideKeyboard()
         }
     }
 
