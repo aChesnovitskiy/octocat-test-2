@@ -1,42 +1,51 @@
 package com.achesnovitskiy.octocattest2.ui.repos
 
-import android.app.Activity
-import android.content.Context.INPUT_METHOD_SERVICE
+import android.content.Context
 import android.os.Build
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
-import android.view.inputmethod.InputMethodManager
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.DrawableCompat
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.achesnovitskiy.octocattest2.App
 import com.achesnovitskiy.octocattest2.R
 import com.achesnovitskiy.octocattest2.data.Repo
 import com.achesnovitskiy.octocattest2.extensions.hideKeyboard
 import com.achesnovitskiy.octocattest2.extensions.showKeyboard
+import com.achesnovitskiy.octocattest2.ui.MainActivity
 import com.achesnovitskiy.octocattest2.viewmodels.repos.ReposState
 import com.achesnovitskiy.octocattest2.viewmodels.repos.ReposViewModel
-import com.achesnovitskiy.octocattest2.viewmodels.repos.ReposViewModelFactory
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.fragment_repos.*
+import javax.inject.Inject
 
 class ReposFragment : Fragment(R.layout.fragment_repos) {
 
-    private val reposViewModel: ReposViewModel by viewModels { ReposViewModelFactory(USER_OCTOCAT) }
+    @Inject
+    lateinit var reposViewModel: ReposViewModel
+
+    private val rootActivity: MainActivity by lazy(LazyThreadSafetyMode.NONE) {
+        activity as MainActivity
+    }
 
     private val reposAdapter: ReposAdapter by lazy(LazyThreadSafetyMode.NONE) {
         ReposAdapter { repo -> navigateToInfo(repo) }
     }
 
     private val compositeDisposable = CompositeDisposable()
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+
+        (rootActivity.application as App).appComponent.inject(this)
+    }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
@@ -55,7 +64,7 @@ class ReposFragment : Fragment(R.layout.fragment_repos) {
 
             DrawableCompat.setTint(
                 drawableProgress,
-                ContextCompat.getColor((activity as AppCompatActivity), R.color.color_accent)
+                ContextCompat.getColor(rootActivity, R.color.color_accent)
             )
 
             repos_progress_bar.indeterminateDrawable = DrawableCompat.unwrap(drawableProgress)
@@ -104,7 +113,7 @@ class ReposFragment : Fragment(R.layout.fragment_repos) {
         }
 
         repos_swipe_refresh_layout.setOnRefreshListener {
-            reposViewModel.onReposFromApiRequest(USER_OCTOCAT)
+            reposViewModel.onReposFromApiRequest()
 
             repos_swipe_refresh_layout.isRefreshing = false
         }
@@ -142,7 +151,7 @@ class ReposFragment : Fragment(R.layout.fragment_repos) {
 
             repos_search_edit_text.requestFocus()
 
-            (activity as AppCompatActivity).showKeyboard()
+            rootActivity.showKeyboard()
         } else {
             repos_search_layout.visibility = View.GONE
             repos_search_button.visibility = View.VISIBLE
@@ -150,7 +159,7 @@ class ReposFragment : Fragment(R.layout.fragment_repos) {
 
             repos_search_edit_text.text = null
 
-            (activity as AppCompatActivity).hideKeyboard()
+            rootActivity.hideKeyboard()
         }
     }
 
@@ -166,9 +175,5 @@ class ReposFragment : Fragment(R.layout.fragment_repos) {
         compositeDisposable.dispose()
 
         super.onDestroy()
-    }
-
-    companion object {
-        const val USER_OCTOCAT = "octocat"
     }
 }
