@@ -15,16 +15,16 @@ import javax.inject.Singleton
 @Singleton
 class ReposViewModel @Inject constructor() : ViewModel() {
 
-    private val repos: BehaviorSubject<List<Repo>> = BehaviorSubject.create()
+    private val reposBehaviorSubject: BehaviorSubject<List<Repo>> = BehaviorSubject.create()
 
-    private val searchQuery: BehaviorSubject<String> = BehaviorSubject.create()
+    private val searchQueryBehaviorSubject: BehaviorSubject<String> = BehaviorSubject.create()
 
     private val compositeDisposable = CompositeDisposable()
 
-    val reposWithSearch: Observable<List<Repo>> = Observable
+    val reposWithSearchObservable: Observable<List<Repo>> = Observable
         .combineLatest(
-            repos,
-            searchQuery,
+            reposBehaviorSubject,
+            searchQueryBehaviorSubject,
             BiFunction { repos: List<Repo>, searchQuery: String ->
                 repos.filter { repo ->
                     repo.name.contains(searchQuery, true)
@@ -32,9 +32,9 @@ class ReposViewModel @Inject constructor() : ViewModel() {
             }
         )
 
-    val state: BehaviorSubject<ReposState> = BehaviorSubject.createDefault(
+    val stateBehaviorSubject: BehaviorSubject<ReposState> = BehaviorSubject.createDefault(
         ReposState(
-            isSearching = false,
+            isSearch = false,
             isLoading = false
         )
     )
@@ -50,7 +50,7 @@ class ReposViewModel @Inject constructor() : ViewModel() {
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe { reposFromApi ->
-                repos.onNext(reposFromApi)
+                reposBehaviorSubject.onNext(reposFromApi)
 
                 updateState { it.copy(isLoading = false) }
             }
@@ -58,17 +58,17 @@ class ReposViewModel @Inject constructor() : ViewModel() {
     }
 
     fun onSearchQuery(query: String?) {
-        searchQuery.onNext(query ?: "")
+        searchQueryBehaviorSubject.onNext(query ?: "")
     }
 
-    fun onSearchModeRequest(isSearch: Boolean) {
-        updateState { it.copy(isSearching = isSearch) }
+    fun onSearchModeChange(isSearchMode: Boolean) {
+        updateState { it.copy(isSearch = isSearchMode) }
     }
 
     private fun updateState(update: (currentState: ReposState) -> ReposState) {
-        val updatedState = update(state.value!!)
+        val updatedState = update(stateBehaviorSubject.value!!)
 
-        state.onNext(updatedState)
+        stateBehaviorSubject.onNext(updatedState)
     }
 
     override fun onCleared() {
@@ -81,6 +81,6 @@ class ReposViewModel @Inject constructor() : ViewModel() {
 }
 
 data class ReposState(
-    val isSearching: Boolean,
+    val isSearch: Boolean,
     val isLoading: Boolean
 )

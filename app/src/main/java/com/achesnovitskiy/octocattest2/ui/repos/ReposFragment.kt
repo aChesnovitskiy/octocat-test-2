@@ -73,11 +73,11 @@ class ReposFragment : Fragment(R.layout.fragment_repos) {
 
     private fun setupSearchView() {
         repos_search_button.setOnClickListener {
-            reposViewModel.onSearchModeRequest(true)
+            reposViewModel.onSearchModeChange(true)
         }
 
         repos_search_back_button.setOnClickListener {
-            reposViewModel.onSearchModeRequest(false)
+            reposViewModel.onSearchModeChange(false)
         }
 
         repos_search_close_button.setOnClickListener {
@@ -121,13 +121,13 @@ class ReposFragment : Fragment(R.layout.fragment_repos) {
 
     private fun setupViewModel() {
         reposViewModel.apply {
-            state
+            stateBehaviorSubject
                 .subscribe { state ->
                     bindState(state)
                 }
                 .let { compositeDisposable.add(it) }
 
-            reposWithSearch
+            reposWithSearchObservable
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe { repos ->
@@ -144,7 +144,7 @@ class ReposFragment : Fragment(R.layout.fragment_repos) {
         repos_progress_bar.visibility =
             if (state.isLoading) View.VISIBLE else View.GONE
 
-        if (state.isSearching) {
+        if (state.isSearch) {
             repos_search_layout.visibility = View.VISIBLE
             repos_search_button.visibility = View.GONE
             repos_title.visibility = View.GONE

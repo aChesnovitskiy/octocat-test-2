@@ -12,22 +12,20 @@ import javax.net.ssl.*
 class TLSSocketFactory : SSLSocketFactory() {
 
     private val delegate: SSLSocketFactory
+
     private var trustManagers: Array<TrustManager> = arrayOf()
 
-    @Throws(KeyStoreException::class, NoSuchAlgorithmException::class)
-    private fun generateTrustManagers() {
-        val trustManagerFactory =
-            TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm())
+    val trustManager: X509TrustManager?
+        get() = trustManagers[0] as X509TrustManager
 
-        trustManagerFactory.init(null as KeyStore?)
+    init {
+        generateTrustManagers()
 
-        val trustManagers = trustManagerFactory.trustManagers
+        val context = SSLContext.getInstance("TLS")
 
-        check(!(trustManagers.size != 1 || trustManagers[0] !is X509TrustManager)) {
-            ("Unexpected default trust managers:" + Arrays.toString(trustManagers))
-        }
+        context.init(null, trustManagers, null)
 
-        this.trustManagers = trustManagers
+        delegate = context.socketFactory
     }
 
     override fun getDefaultCipherSuites(): Array<String> {
@@ -83,6 +81,22 @@ class TLSSocketFactory : SSLSocketFactory() {
         return enableTLSOnSocket(delegate.createSocket(address, port, localAddress, localPort))
     }
 
+    @Throws(KeyStoreException::class, NoSuchAlgorithmException::class)
+    private fun generateTrustManagers() {
+        val trustManagerFactory =
+            TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm())
+
+        trustManagerFactory.init(null as KeyStore?)
+
+        val trustManagers = trustManagerFactory.trustManagers
+
+        check(!(trustManagers.size != 1 || trustManagers[0] !is X509TrustManager)) {
+            ("Unexpected default trust managers:" + Arrays.toString(trustManagers))
+        }
+
+        this.trustManagers = trustManagers
+    }
+
     private fun enableTLSOnSocket(socket: Socket): Socket {
         if (socket is SSLSocket) {
             socket.enabledProtocols = arrayOf(
@@ -91,18 +105,5 @@ class TLSSocketFactory : SSLSocketFactory() {
             )
         }
         return socket
-    }
-
-    val trustManager: X509TrustManager?
-        get() = trustManagers[0] as X509TrustManager
-
-    init {
-        generateTrustManagers()
-
-        val context = SSLContext.getInstance("TLS")
-
-        context.init(null, trustManagers, null)
-
-        delegate = context.socketFactory
     }
 }

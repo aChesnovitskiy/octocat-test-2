@@ -7,6 +7,7 @@ import com.achesnovitskiy.octocattest2.App
 import com.achesnovitskiy.octocattest2.R
 import com.achesnovitskiy.octocattest2.ui.MainActivity
 import com.achesnovitskiy.octocattest2.viewmodels.repoinfo.RepoInfoViewModel
+import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
 import kotlinx.android.synthetic.main.fragment_repo_info.*
 import javax.inject.Inject
@@ -24,7 +25,7 @@ class RepoInfoFragment : Fragment(R.layout.fragment_repo_info) {
         arguments?.get("repo_name") as String
     }
 
-    private lateinit var disposable: Disposable
+    private val compositeDisposable = CompositeDisposable()
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -49,14 +50,16 @@ class RepoInfoFragment : Fragment(R.layout.fragment_repo_info) {
         repoInfoViewModel.apply {
             onGetRepoNameFromArgs(repoNameFromArgs)
 
-            disposable = repoName.subscribe { repoName ->
-                repo_name_text_view.text = repoName
-            }
+            repoNameBehaviorSubject
+                .subscribe { repoName ->
+                    repo_name_text_view.text = repoName
+                }
+                .let { compositeDisposable.add(it) }
         }
     }
 
     override fun onStop() {
-        disposable.dispose()
+        compositeDisposable.dispose()
 
         super.onStop()
     }

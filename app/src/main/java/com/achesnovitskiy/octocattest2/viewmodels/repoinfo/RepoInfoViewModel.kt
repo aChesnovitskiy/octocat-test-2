@@ -6,9 +6,9 @@ import javax.inject.Inject
 
 class RepoInfoViewModel @Inject constructor() : ViewModel() {
 
-    val repoName: BehaviorSubject<String> = BehaviorSubject.create()
+    val repoNameBehaviorSubject: BehaviorSubject<String> = BehaviorSubject.create()
 
     fun onGetRepoNameFromArgs(repoNameFromArgs: String) {
-        repoName.onNext(repoNameFromArgs)
+        repoNameBehaviorSubject.onNext(repoNameFromArgs)
     }
 }
