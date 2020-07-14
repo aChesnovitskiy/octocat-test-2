@@ -8,7 +8,6 @@ import com.achesnovitskiy.octocattest2.R
 import com.achesnovitskiy.octocattest2.ui.MainActivity
 import com.achesnovitskiy.octocattest2.viewmodels.repoinfo.RepoInfoViewModel
 import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.disposables.Disposable
 import kotlinx.android.synthetic.main.fragment_repo_info.*
 import javax.inject.Inject
 
