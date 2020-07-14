@@ -10,9 +10,7 @@ import io.reactivex.functions.BiFunction
 import io.reactivex.schedulers.Schedulers
 import io.reactivex.subjects.BehaviorSubject
 import javax.inject.Inject
-import javax.inject.Singleton
 
-@Singleton
 class ReposViewModel @Inject constructor() : ViewModel() {
 
     private val reposBehaviorSubject: BehaviorSubject<List<Repo>> = BehaviorSubject.create()

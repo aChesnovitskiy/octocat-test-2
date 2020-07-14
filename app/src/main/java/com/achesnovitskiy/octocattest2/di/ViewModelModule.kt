@@ -1,6 +1,8 @@
 package com.achesnovitskiy.octocattest2.di
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import com.achesnovitskiy.octocattest2.viewmodels.ViewModelFactory
 import com.achesnovitskiy.octocattest2.viewmodels.repoinfo.RepoInfoViewModel
 import com.achesnovitskiy.octocattest2.viewmodels.repos.ReposViewModel
 import dagger.Binds
@@ -12,12 +14,15 @@ import dagger.multibindings.IntoMap
 abstract class ViewModelModule {
 
     @Binds
+    internal abstract fun viewModelFactory(factory: ViewModelFactory): ViewModelProvider.Factory
+
+    @Binds
     @IntoMap
     @ViewModelKey(ReposViewModel::class)
-    abstract fun reposViewModel(reposViewModel: ReposViewModel?): ViewModel?
+    internal abstract fun reposViewModel(reposViewModel: ReposViewModel): ViewModel
 
     @Binds
     @IntoMap
     @ViewModelKey(RepoInfoViewModel::class)
-    abstract fun repoInfoViewModel(repoInfoViewModel: RepoInfoViewModel?): ViewModel?
+    internal abstract fun repoInfoViewModel(repoInfoViewModel: RepoInfoViewModel): ViewModel
 }

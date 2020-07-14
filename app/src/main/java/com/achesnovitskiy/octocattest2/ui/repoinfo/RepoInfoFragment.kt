@@ -3,6 +3,7 @@ package com.achesnovitskiy.octocattest2.ui.repoinfo
 import android.content.Context
 import android.os.Bundle
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
 import com.achesnovitskiy.octocattest2.App
 import com.achesnovitskiy.octocattest2.R
 import com.achesnovitskiy.octocattest2.ui.MainActivity
@@ -14,7 +15,11 @@ import javax.inject.Inject
 class RepoInfoFragment : Fragment(R.layout.fragment_repo_info) {
 
     @Inject
-    lateinit var repoInfoViewModel: RepoInfoViewModel
+    lateinit var viewModelFactory: ViewModelProvider.Factory
+
+    private val repoInfoViewModel: RepoInfoViewModel by lazy {
+        ViewModelProvider(this, viewModelFactory).get(RepoInfoViewModel::class.java)
+    }
 
     private val rootActivity: MainActivity by lazy(LazyThreadSafetyMode.NONE) {
         activity as MainActivity

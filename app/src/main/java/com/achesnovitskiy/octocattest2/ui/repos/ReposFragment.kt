@@ -9,6 +9,7 @@ import android.view.View
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.DrawableCompat
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -29,7 +30,11 @@ import javax.inject.Inject
 class ReposFragment : Fragment(R.layout.fragment_repos) {
 
     @Inject
-    lateinit var reposViewModel: ReposViewModel
+    lateinit var viewModelFactory: ViewModelProvider.Factory
+
+    private val reposViewModel: ReposViewModel by lazy {
+        ViewModelProvider(this, viewModelFactory).get(ReposViewModel::class.java)
+    }
 
     private val rootActivity: MainActivity by lazy(LazyThreadSafetyMode.NONE) {
         activity as MainActivity
