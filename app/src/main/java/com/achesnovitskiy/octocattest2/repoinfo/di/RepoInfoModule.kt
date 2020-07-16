@@ -10,11 +10,11 @@ import dagger.Provides
 @Module
 class RepoInfoModule(
     private val viewModelStoreOwner: ViewModelStoreOwner,
-    repoNameFromArgs: String
+    private val repoNameFromArgs: String
 ) {
 
     @Provides
-    fun provideRepoInfoViewModel(repoNameFromArgs: String): RepoInfoViewModel =
+    fun provideRepoInfoViewModel(): RepoInfoViewModel =
         ViewModelProvider(viewModelStoreOwner)
-            .get(RepoInfoViewModelImpl(repoNameFromArgs)::class.java)
+            .get(RepoInfoViewModelImpl()::class.java)
 }

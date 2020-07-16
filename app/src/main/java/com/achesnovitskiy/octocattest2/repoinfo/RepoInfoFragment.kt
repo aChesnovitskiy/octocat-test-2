@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModelProvider
 import com.achesnovitskiy.octocattest2.App
 import com.achesnovitskiy.octocattest2.R
 import com.achesnovitskiy.octocattest2.MainActivity
+import com.achesnovitskiy.octocattest2.repoinfo.di.RepoInfoModule
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
 import kotlinx.android.synthetic.main.fragment_repo_info.*
@@ -26,7 +27,11 @@ class RepoInfoFragment : Fragment(R.layout.fragment_repo_info) {
     override fun onAttach(context: Context) {
         super.onAttach(context)
 
-        (activity?.application as App).appComponent.inject(this)
+        (activity?.application as App).appComponent
+            .repoInfoComponent()
+            .repoInfoModule(RepoInfoModule(this, repoNameFromArgs))
+            .build()
+            .inject(this)
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
