@@ -55,9 +55,7 @@ class RepoInfoFragment : Fragment(R.layout.fragment_repo_info) {
             onGetRepoNameFromArgs(repoNameFromArgs)
 
             repoNameBehaviorSubject
-                .subscribe { repoName ->
-                    repo_name_text_view.text = repoName
-                }
+                .subscribe(repo_name_text_view::setText)
                 .let { compositeDisposable.add(it) }
         }
     }
