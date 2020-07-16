@@ -1,4 +1,4 @@
-package com.achesnovitskiy.octocattest2.ui.repoinfo
+package com.achesnovitskiy.octocattest2.repoinfo
 
 import android.content.Context
 import android.os.Bundle
@@ -7,7 +7,6 @@ import androidx.lifecycle.ViewModelProvider
 import com.achesnovitskiy.octocattest2.App
 import com.achesnovitskiy.octocattest2.R
 import com.achesnovitskiy.octocattest2.ui.MainActivity
-import com.achesnovitskiy.octocattest2.viewmodels.repoinfo.RepoInfoViewModel
 import io.reactivex.disposables.CompositeDisposable
 import kotlinx.android.synthetic.main.fragment_repo_info.*
 import javax.inject.Inject

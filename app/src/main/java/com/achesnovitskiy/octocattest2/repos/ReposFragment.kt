@@ -1,4 +1,4 @@
-package com.achesnovitskiy.octocattest2.ui.repos
+package com.achesnovitskiy.octocattest2.repos
 
 import android.content.Context
 import android.os.Build
@@ -19,8 +19,6 @@ import com.achesnovitskiy.octocattest2.data.Repo
 import com.achesnovitskiy.octocattest2.extensions.hideKeyboard
 import com.achesnovitskiy.octocattest2.extensions.showKeyboard
 import com.achesnovitskiy.octocattest2.ui.MainActivity
-import com.achesnovitskiy.octocattest2.viewmodels.repos.ReposState
-import com.achesnovitskiy.octocattest2.viewmodels.repos.ReposViewModel
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
@@ -41,7 +39,11 @@ class ReposFragment : Fragment(R.layout.fragment_repos) {
     }
 
     private val reposAdapter: ReposAdapter by lazy(LazyThreadSafetyMode.NONE) {
-        ReposAdapter { repo -> navigateToInfo(repo) }
+        ReposAdapter { repo ->
+            navigateToInfo(
+                repo
+            )
+        }
     }
 
     private val compositeDisposable = CompositeDisposable()
@@ -171,8 +173,9 @@ class ReposFragment : Fragment(R.layout.fragment_repos) {
     private fun navigateToInfo(repo: Repo) {
         this.findNavController()
             .navigate(
-                ReposFragmentDirections
-                    .actionRepositoriesFragmentToRepoInfoFragment(repo.name)
+                ReposFragmentDirections.actionRepositoriesFragmentToRepoInfoFragment(
+                    repo.name
+                )
             )
     }
 

@@ -1,4 +1,4 @@
-package com.achesnovitskiy.octocattest2.viewmodels.repoinfo
+package com.achesnovitskiy.octocattest2.repoinfo
 
 import androidx.lifecycle.ViewModel
 import io.reactivex.subjects.BehaviorSubject

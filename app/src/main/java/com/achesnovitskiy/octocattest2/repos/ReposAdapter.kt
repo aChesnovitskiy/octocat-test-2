@@ -1,4 +1,4 @@
-package com.achesnovitskiy.octocattest2.ui.repos
+package com.achesnovitskiy.octocattest2.repos
 
 import android.view.LayoutInflater
 import android.view.View
@@ -13,7 +13,9 @@ import kotlinx.android.extensions.LayoutContainer
 import kotlinx.android.synthetic.main.item_repo.view.*
 
 class ReposAdapter(private val onItemClickListener: (Repo) -> Unit) :
-    ListAdapter<Repo, RepoViewHolder>(ReposDiffCallback()) {
+    ListAdapter<Repo, RepoViewHolder>(
+        ReposDiffCallback()
+    ) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RepoViewHolder =
         RepoViewHolder(

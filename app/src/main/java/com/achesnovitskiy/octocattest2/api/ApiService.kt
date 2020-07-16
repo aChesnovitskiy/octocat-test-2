@@ -10,3 +10,8 @@ interface ApiService {
     @GET("users/{username}/repos")
     fun getReposByUser(@Path("username") userName: String): Single<List<Repo>>
 }
+
+//interface ApiService {
+//
+//    fun getReposByUser(userName: String): Single<List<Repo>>
+//}

@@ -1,4 +1,4 @@
-package com.achesnovitskiy.octocattest2.viewmodels.repos
+package com.achesnovitskiy.octocattest2.repos
 
 import androidx.lifecycle.ViewModel
 import com.achesnovitskiy.octocattest2.data.Repo

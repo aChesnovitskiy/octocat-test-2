@@ -3,8 +3,8 @@ package com.achesnovitskiy.octocattest2.di
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.achesnovitskiy.octocattest2.viewmodels.ViewModelFactory
-import com.achesnovitskiy.octocattest2.viewmodels.repoinfo.RepoInfoViewModel
-import com.achesnovitskiy.octocattest2.viewmodels.repos.ReposViewModel
+import com.achesnovitskiy.octocattest2.repoinfo.RepoInfoViewModel
+import com.achesnovitskiy.octocattest2.repos.ReposViewModel
 import dagger.Binds
 import dagger.Module
 import dagger.multibindings.IntoMap
