@@ -1,14 +1,18 @@
 package com.achesnovitskiy.octocattest2.repoinfo
 
 import androidx.lifecycle.ViewModel
+import io.reactivex.Observable
 import io.reactivex.subjects.BehaviorSubject
 import javax.inject.Inject
 
-class RepoInfoViewModel @Inject constructor() : ViewModel() {
+interface RepoInfoViewModel {
 
-    val repoNameBehaviorSubject: BehaviorSubject<String> = BehaviorSubject.create()
+    val repoNameObservable: Observable<String>
+}
 
-    fun onGetRepoNameFromArgs(repoNameFromArgs: String) {
-        repoNameBehaviorSubject.onNext(repoNameFromArgs)
-    }
+class RepoInfoViewModelImpl @Inject constructor(repoNameFromArgs: String) : ViewModel(),
+    RepoInfoViewModel {
+
+    override val repoNameObservable: Observable<String> =
+        BehaviorSubject.createDefault(repoNameFromArgs)
 }

@@ -1,6 +1,6 @@
 package com.achesnovitskiy.octocattest2.di
 
-import com.achesnovitskiy.octocattest2.api.ApiServiceModule
+import com.achesnovitskiy.octocattest2.api.di.ApiServiceModule
 import com.achesnovitskiy.octocattest2.repoinfo.RepoInfoFragment
 import com.achesnovitskiy.octocattest2.repos.ReposFragment
 import dagger.Component

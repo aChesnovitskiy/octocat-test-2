@@ -1,4 +1,4 @@
-package com.achesnovitskiy.octocattest2.api
+package com.achesnovitskiy.octocattest2.api.di
 
 import dagger.Subcomponent
 

@@ -21,8 +21,8 @@ abstract class ViewModelModule {
     @ViewModelKey(ReposViewModel::class)
     internal abstract fun reposViewModel(reposViewModel: ReposViewModel): ViewModel
 
-    @Binds
-    @IntoMap
-    @ViewModelKey(RepoInfoViewModel::class)
-    internal abstract fun repoInfoViewModel(repoInfoViewModel: RepoInfoViewModel): ViewModel
+//    @Binds
+//    @IntoMap
+//    @ViewModelKey(RepoInfoViewModel::class)
+//    internal abstract fun repoInfoViewModel(repoInfoViewModel: RepoInfoViewModel): ViewModel
 }
