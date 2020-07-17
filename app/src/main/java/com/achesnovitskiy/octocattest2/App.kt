@@ -1,10 +1,10 @@
 package com.achesnovitskiy.octocattest2
 
-import android.app.Application
+import androidx.multidex.MultiDexApplication
 import com.achesnovitskiy.octocattest2.di.AppComponent
 import com.achesnovitskiy.octocattest2.di.DaggerAppComponent
 
-class App : Application() {
+class App : MultiDexApplication() {
 
     val appComponent: AppComponent by lazy {
         DaggerAppComponent

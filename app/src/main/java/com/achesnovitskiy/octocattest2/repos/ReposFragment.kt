@@ -30,17 +30,20 @@ class ReposFragment : Fragment(R.layout.fragment_repos) {
     @Inject
     lateinit var reposViewModel: ReposViewModel
 
+    @Inject
+    lateinit var reposAdapter: ReposAdapter
+
     private val rootActivity: MainActivity by lazy(LazyThreadSafetyMode.NONE) {
         activity as MainActivity
     }
 
-    private val reposAdapter: ReposAdapter by lazy(LazyThreadSafetyMode.NONE) {
-        ReposAdapter { repo ->
-            navigateToInfo(
-                repo
-            )
-        }
-    }
+//    private val reposAdapter: ReposAdapter by lazy(LazyThreadSafetyMode.NONE) {
+//        ReposAdapter { repo ->
+//            navigateToInfo(
+//                repo
+//            )
+//        }
+//    }
 
     private val compositeDisposable = CompositeDisposable()
 
@@ -49,7 +52,13 @@ class ReposFragment : Fragment(R.layout.fragment_repos) {
 
         (rootActivity.application as App).appComponent
             .reposComponent()
-            .reposModule(ReposModule(this, USER_OCTOCAT))
+            .reposModule(
+                ReposModule(
+                    viewModelStoreOwner = this,
+                    userName = USER_OCTOCAT,
+                    onItemClickListener = { repo -> navigateToInfo(repo) }
+                )
+            )
             .build()
             .inject(this)
     }
