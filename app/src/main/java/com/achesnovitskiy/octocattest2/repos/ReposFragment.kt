@@ -12,12 +12,12 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.achesnovitskiy.octocattest2.App
+import com.achesnovitskiy.octocattest2.app.App
 import com.achesnovitskiy.octocattest2.R
 import com.achesnovitskiy.octocattest2.data.Repo
 import com.achesnovitskiy.octocattest2.extensions.hideKeyboard
 import com.achesnovitskiy.octocattest2.extensions.showKeyboard
-import com.achesnovitskiy.octocattest2.MainActivity
+import com.achesnovitskiy.octocattest2.app.MainActivity
 import com.achesnovitskiy.octocattest2.repos.di.ReposModule
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
@@ -36,14 +36,6 @@ class ReposFragment : Fragment(R.layout.fragment_repos) {
     private val rootActivity: MainActivity by lazy(LazyThreadSafetyMode.NONE) {
         activity as MainActivity
     }
-
-//    private val reposAdapter: ReposAdapter by lazy(LazyThreadSafetyMode.NONE) {
-//        ReposAdapter { repo ->
-//            navigateToInfo(
-//                repo
-//            )
-//        }
-//    }
 
     private val compositeDisposable = CompositeDisposable()
 

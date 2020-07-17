@@ -1,5 +1,6 @@
 package com.achesnovitskiy.octocattest2.api
 
+import com.achesnovitskiy.octocattest2.repos.di.ReposScope
 import java.io.IOException
 import java.net.InetAddress
 import java.net.Socket
@@ -10,6 +11,7 @@ import java.util.*
 import javax.inject.Inject
 import javax.net.ssl.*
 
+@ReposScope
 class TLSSocketFactory @Inject constructor() : SSLSocketFactory() {
 
     private val delegate: SSLSocketFactory

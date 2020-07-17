@@ -1,4 +1,4 @@
-package com.achesnovitskiy.octocattest2
+package com.achesnovitskiy.octocattest2.app
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle

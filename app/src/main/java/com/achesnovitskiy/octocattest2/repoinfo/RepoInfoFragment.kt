@@ -3,7 +3,7 @@ package com.achesnovitskiy.octocattest2.repoinfo
 import android.content.Context
 import android.os.Bundle
 import androidx.fragment.app.Fragment
-import com.achesnovitskiy.octocattest2.App
+import com.achesnovitskiy.octocattest2.app.App
 import com.achesnovitskiy.octocattest2.R
 import com.achesnovitskiy.octocattest2.repoinfo.di.RepoInfoModule
 import io.reactivex.disposables.Disposable

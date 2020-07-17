@@ -3,7 +3,7 @@ package com.achesnovitskiy.octocattest2.repos
 import androidx.lifecycle.ViewModel
 import com.achesnovitskiy.octocattest2.data.Repo
 import com.achesnovitskiy.octocattest2.repos.di.ReposScope
-import com.achesnovitskiy.octocattest2.repositories.Repository
+import com.achesnovitskiy.octocattest2.domain.Repository
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
@@ -26,7 +26,7 @@ interface ReposViewModel {
 }
 
 @ReposScope
-class ReposViewModelImpl @Inject constructor(userName: String) : ViewModel(), ReposViewModel {
+class ReposViewModelImpl @Inject constructor(userName: String, private val repository: Repository) : ViewModel(), ReposViewModel {
 
     private val reposBehaviorSubject: BehaviorSubject<List<Repo>> = BehaviorSubject.create()
 
@@ -44,6 +44,7 @@ class ReposViewModelImpl @Inject constructor(userName: String) : ViewModel(), Re
                 }
             }
         )
+
     override val reposStateBehaviorSubject: BehaviorSubject<ReposState> =
         BehaviorSubject.createDefault(
             ReposState(
@@ -59,7 +60,7 @@ class ReposViewModelImpl @Inject constructor(userName: String) : ViewModel(), Re
     override fun onReposFromApiRequest(userName: String) {
         updateState { it.copy(isLoading = true) }
 
-        disposable = Repository.loadReposFromApi(userName)
+        disposable = repository.getReposByUser(userName)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe { reposFromApi ->

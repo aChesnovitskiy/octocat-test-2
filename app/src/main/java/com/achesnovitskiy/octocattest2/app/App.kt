@@ -1,8 +1,8 @@
-package com.achesnovitskiy.octocattest2
+package com.achesnovitskiy.octocattest2.app
 
 import androidx.multidex.MultiDexApplication
-import com.achesnovitskiy.octocattest2.di.AppComponent
-import com.achesnovitskiy.octocattest2.di.DaggerAppComponent
+import com.achesnovitskiy.octocattest2.app.di.AppComponent
+import com.achesnovitskiy.octocattest2.app.di.DaggerAppComponent
 
 class App : MultiDexApplication() {
 
