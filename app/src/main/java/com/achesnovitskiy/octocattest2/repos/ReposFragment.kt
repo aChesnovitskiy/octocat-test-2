@@ -9,7 +9,6 @@ import android.view.View
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.DrawableCompat
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -19,6 +18,7 @@ import com.achesnovitskiy.octocattest2.data.Repo
 import com.achesnovitskiy.octocattest2.extensions.hideKeyboard
 import com.achesnovitskiy.octocattest2.extensions.showKeyboard
 import com.achesnovitskiy.octocattest2.MainActivity
+import com.achesnovitskiy.octocattest2.repos.di.ReposModule
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
@@ -28,11 +28,7 @@ import javax.inject.Inject
 class ReposFragment : Fragment(R.layout.fragment_repos) {
 
     @Inject
-    lateinit var viewModelFactory: ViewModelProvider.Factory
-
-    private val reposViewModel: ReposViewModel by lazy {
-        ViewModelProvider(this, viewModelFactory).get(ReposViewModel::class.java)
-    }
+    lateinit var reposViewModel: ReposViewModel
 
     private val rootActivity: MainActivity by lazy(LazyThreadSafetyMode.NONE) {
         activity as MainActivity
@@ -51,7 +47,11 @@ class ReposFragment : Fragment(R.layout.fragment_repos) {
     override fun onAttach(context: Context) {
         super.onAttach(context)
 
-        (rootActivity.application as App).appComponent.inject(this)
+        (rootActivity.application as App).appComponent
+            .reposComponent()
+            .reposModule(ReposModule(this, USER_OCTOCAT))
+            .build()
+            .inject(this)
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
@@ -60,7 +60,6 @@ class ReposFragment : Fragment(R.layout.fragment_repos) {
         setupProgressBar()
         setupSearchView()
         setupRecyclerView()
-        setupViewModel()
     }
 
     private fun setupProgressBar() {
@@ -120,30 +119,9 @@ class ReposFragment : Fragment(R.layout.fragment_repos) {
         }
 
         repos_swipe_refresh_layout.setOnRefreshListener {
-            reposViewModel.onReposFromApiRequest()
+            reposViewModel.onReposFromApiRequest(USER_OCTOCAT)
 
             repos_swipe_refresh_layout.isRefreshing = false
-        }
-    }
-
-    private fun setupViewModel() {
-        reposViewModel.apply {
-            stateBehaviorSubject
-                .subscribe { state ->
-                    bindState(state)
-                }
-                .let { compositeDisposable.add(it) }
-
-            reposWithSearchObservable
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe { repos ->
-                    repos_list_is_empty_text_view.visibility =
-                        if (repos.isNullOrEmpty()) View.VISIBLE else View.GONE
-
-                    reposAdapter.submitList(repos)
-                }
-                .let { compositeDisposable.add(it) }
         }
     }
 
@@ -179,9 +157,34 @@ class ReposFragment : Fragment(R.layout.fragment_repos) {
             )
     }
 
-    override fun onDestroy() {
+    override fun onResume() {
+        super.onResume()
+
+        reposViewModel.reposStateBehaviorSubject
+            .subscribe { state ->
+                bindState(state)
+            }
+            .let(compositeDisposable::add)
+
+        reposViewModel.reposWithSearchObservable
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe { repos ->
+                repos_list_is_empty_text_view.visibility =
+                    if (repos.isNullOrEmpty()) View.VISIBLE else View.GONE
+
+                reposAdapter.submitList(repos)
+            }
+            .let(compositeDisposable::add)
+    }
+
+    override fun onStop() {
         compositeDisposable.dispose()
 
-        super.onDestroy()
+        super.onStop()
+    }
+
+    companion object {
+        const val USER_OCTOCAT = "octocat"
     }
 }

@@ -3,19 +3,16 @@ package com.achesnovitskiy.octocattest2.repoinfo
 import android.content.Context
 import android.os.Bundle
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
 import com.achesnovitskiy.octocattest2.App
 import com.achesnovitskiy.octocattest2.R
-import com.achesnovitskiy.octocattest2.MainActivity
 import com.achesnovitskiy.octocattest2.repoinfo.di.RepoInfoModule
-import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
 import kotlinx.android.synthetic.main.fragment_repo_info.*
 import javax.inject.Inject
 
 class RepoInfoFragment : Fragment(R.layout.fragment_repo_info) {
 
-    private val repoNameFromArgs: String by lazy(LazyThreadSafetyMode.NONE) {
+    private val repoName: String by lazy(LazyThreadSafetyMode.NONE) {
         arguments?.get("repo_name") as String
     }
 
@@ -29,7 +26,7 @@ class RepoInfoFragment : Fragment(R.layout.fragment_repo_info) {
 
         (activity?.application as App).appComponent
             .repoInfoComponent()
-            .repoInfoModule(RepoInfoModule(this, repoNameFromArgs))
+            .repoInfoModule(RepoInfoModule(this, repoName))
             .build()
             .inject(this)
     }
