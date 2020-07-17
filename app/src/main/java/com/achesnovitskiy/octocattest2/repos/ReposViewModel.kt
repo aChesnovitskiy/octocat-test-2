@@ -2,11 +2,10 @@ package com.achesnovitskiy.octocattest2.repos
 
 import androidx.lifecycle.ViewModel
 import com.achesnovitskiy.octocattest2.data.Repo
-import com.achesnovitskiy.octocattest2.di.FragmentScope
+import com.achesnovitskiy.octocattest2.repos.di.ReposScope
 import com.achesnovitskiy.octocattest2.repositories.Repository
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
 import io.reactivex.functions.BiFunction
 import io.reactivex.schedulers.Schedulers
@@ -26,6 +25,7 @@ interface ReposViewModel {
     fun onSearchModeChange(isSearchMode: Boolean)
 }
 
+@ReposScope
 class ReposViewModelImpl @Inject constructor(userName: String) : ViewModel(), ReposViewModel {
 
     private val reposBehaviorSubject: BehaviorSubject<List<Repo>> = BehaviorSubject.create()

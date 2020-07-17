@@ -1,11 +1,10 @@
 package com.achesnovitskiy.octocattest2.repos.di
 
-import com.achesnovitskiy.octocattest2.di.FragmentScope
 import com.achesnovitskiy.octocattest2.repos.ReposFragment
 import dagger.Subcomponent
 
+@ReposScope
 @Subcomponent(modules = [ReposModule::class])
-@FragmentScope
 interface ReposComponent {
 
     @Subcomponent.Builder

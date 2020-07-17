@@ -46,9 +46,9 @@ class RepoInfoFragment : Fragment(R.layout.fragment_repo_info) {
             .subscribe(repo_name_text_view::setText)
     }
 
-    override fun onStop() {
+    override fun onDestroy() {
         disposable?.dispose()
 
-        super.onStop()
+        super.onDestroy()
     }
 }

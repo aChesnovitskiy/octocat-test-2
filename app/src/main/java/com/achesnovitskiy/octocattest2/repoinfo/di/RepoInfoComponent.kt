@@ -3,6 +3,7 @@ package com.achesnovitskiy.octocattest2.repoinfo.di
 import com.achesnovitskiy.octocattest2.repoinfo.RepoInfoFragment
 import dagger.Subcomponent
 
+@RepoInfoScope
 @Subcomponent(modules = [RepoInfoModule::class])
 interface RepoInfoComponent {
 

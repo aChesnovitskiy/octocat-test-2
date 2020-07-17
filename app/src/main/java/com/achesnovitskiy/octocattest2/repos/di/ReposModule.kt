@@ -3,7 +3,6 @@ package com.achesnovitskiy.octocattest2.repos.di
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelStoreOwner
-import com.achesnovitskiy.octocattest2.di.FragmentScope
 import com.achesnovitskiy.octocattest2.repos.ReposViewModel
 import com.achesnovitskiy.octocattest2.repos.ReposViewModelImpl
 import dagger.Module
@@ -16,7 +15,6 @@ class ReposModule(
 ) {
 
     @Provides
-    @FragmentScope
     fun provideReposViewModel(): ReposViewModel =
         ViewModelProvider(viewModelStoreOwner, ReposViewModelFactory(userName))
             .get(ReposViewModelImpl::class.java)

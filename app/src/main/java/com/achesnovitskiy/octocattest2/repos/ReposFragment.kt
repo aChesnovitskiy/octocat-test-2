@@ -178,10 +178,10 @@ class ReposFragment : Fragment(R.layout.fragment_repos) {
             .let(compositeDisposable::add)
     }
 
-    override fun onStop() {
+    override fun onDestroy() {
         compositeDisposable.dispose()
 
-        super.onStop()
+        super.onDestroy()
     }
 
     companion object {

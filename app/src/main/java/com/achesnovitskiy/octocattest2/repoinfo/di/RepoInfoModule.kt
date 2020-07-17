@@ -3,7 +3,6 @@ package com.achesnovitskiy.octocattest2.repoinfo.di
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelStoreOwner
-import com.achesnovitskiy.octocattest2.di.FragmentScope
 import com.achesnovitskiy.octocattest2.repoinfo.RepoInfoViewModel
 import com.achesnovitskiy.octocattest2.repoinfo.RepoInfoViewModelImpl
 import dagger.Module
