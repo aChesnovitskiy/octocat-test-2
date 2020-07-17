@@ -10,9 +10,9 @@ interface RepoInfoViewModel {
     val repoNameObservable: Observable<String>
 }
 
-class RepoInfoViewModelImpl @Inject constructor(/*repoNameFromArgs: String*/) : ViewModel(),
+class RepoInfoViewModelImpl @Inject constructor(repoNameFromArgs: String) : ViewModel(),
     RepoInfoViewModel {
 
     override val repoNameObservable: Observable<String> =
-        BehaviorSubject.createDefault("XXX")
+        BehaviorSubject.createDefault(repoNameFromArgs)
 }

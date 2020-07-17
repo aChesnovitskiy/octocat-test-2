@@ -1,5 +1,6 @@
 package com.achesnovitskiy.octocattest2.repoinfo.di
 
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelStoreOwner
 import com.achesnovitskiy.octocattest2.repoinfo.RepoInfoViewModel
@@ -15,6 +16,14 @@ class RepoInfoModule(
 
     @Provides
     fun provideRepoInfoViewModel(): RepoInfoViewModel =
-        ViewModelProvider(viewModelStoreOwner)
-            .get(RepoInfoViewModelImpl()::class.java)
+        ViewModelProvider(viewModelStoreOwner, RepoInfoViewModelFactory(repoNameFromArgs))
+            .get(RepoInfoViewModelImpl::class.java)
+
+    class RepoInfoViewModelFactory(private val repoNameFromArgs: String) :
+        ViewModelProvider.NewInstanceFactory() {
+
+        @Suppress("UNCHECKED_CAST")
+        override fun <T : ViewModel?> create(modelClass: Class<T>): T =
+            RepoInfoViewModelImpl(repoNameFromArgs) as T
+    }
 }
