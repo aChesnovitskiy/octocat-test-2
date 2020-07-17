@@ -1,17 +1,13 @@
 package com.achesnovitskiy.octocattest2.app.di
 
-import com.achesnovitskiy.octocattest2.repoinfo.di.RepoInfoComponent
-import com.achesnovitskiy.octocattest2.repos.di.ReposComponent
+import com.achesnovitskiy.octocattest2.ui.repoinfo.di.RepoInfoComponent
+import com.achesnovitskiy.octocattest2.ui.repos.di.ReposComponent
 import dagger.Component
 import javax.inject.Singleton
 
 @Singleton
 @Component(modules = [AppSubcomponents::class])
 interface AppComponent {
-
-//    fun apiServiceComponent(): ApiServiceComponent.Factory
-
-//    fun inject(fragment: RepoInfoFragment)
 
     fun reposComponent(): ReposComponent.Builder
 

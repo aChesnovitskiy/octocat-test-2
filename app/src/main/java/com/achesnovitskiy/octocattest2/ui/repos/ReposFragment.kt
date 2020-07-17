@@ -1,4 +1,4 @@
-package com.achesnovitskiy.octocattest2.repos
+package com.achesnovitskiy.octocattest2.ui.repos
 
 import android.content.Context
 import android.os.Build
@@ -14,11 +14,11 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.achesnovitskiy.octocattest2.app.App
 import com.achesnovitskiy.octocattest2.R
-import com.achesnovitskiy.octocattest2.data.Repo
+import com.achesnovitskiy.octocattest2.data.pojo.Repo
 import com.achesnovitskiy.octocattest2.extensions.hideKeyboard
 import com.achesnovitskiy.octocattest2.extensions.showKeyboard
 import com.achesnovitskiy.octocattest2.app.MainActivity
-import com.achesnovitskiy.octocattest2.repos.di.ReposModule
+import com.achesnovitskiy.octocattest2.ui.repos.di.ReposModule
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
@@ -61,6 +61,31 @@ class ReposFragment : Fragment(R.layout.fragment_repos) {
         setupProgressBar()
         setupSearchView()
         setupRecyclerView()
+    }
+
+    override fun onResume() {
+        super.onResume()
+
+        reposViewModel.reposStateBehaviorSubject
+            .subscribe(::bindState)
+            .let(compositeDisposable::add)
+
+        reposViewModel.reposWithSearchObservable
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe { repos ->
+                repos_list_is_empty_text_view.visibility =
+                    if (repos.isNullOrEmpty()) View.VISIBLE else View.GONE
+
+                reposAdapter.submitList(repos)
+            }
+            .let(compositeDisposable::add)
+    }
+
+    override fun onDestroy() {
+        compositeDisposable.dispose()
+
+        super.onDestroy()
     }
 
     private fun setupProgressBar() {
@@ -152,37 +177,8 @@ class ReposFragment : Fragment(R.layout.fragment_repos) {
     private fun navigateToInfo(repo: Repo) {
         this.findNavController()
             .navigate(
-                ReposFragmentDirections.actionRepositoriesFragmentToRepoInfoFragment(
-                    repo.name
-                )
+                ReposFragmentDirections.actionRepositoriesFragmentToRepoInfoFragment(repo.name)
             )
-    }
-
-    override fun onResume() {
-        super.onResume()
-
-        reposViewModel.reposStateBehaviorSubject
-            .subscribe { state ->
-                bindState(state)
-            }
-            .let(compositeDisposable::add)
-
-        reposViewModel.reposWithSearchObservable
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe { repos ->
-                repos_list_is_empty_text_view.visibility =
-                    if (repos.isNullOrEmpty()) View.VISIBLE else View.GONE
-
-                reposAdapter.submitList(repos)
-            }
-            .let(compositeDisposable::add)
-    }
-
-    override fun onDestroy() {
-        compositeDisposable.dispose()
-
-        super.onDestroy()
     }
 
     companion object {

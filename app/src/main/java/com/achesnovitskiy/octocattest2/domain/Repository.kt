@@ -1,8 +1,8 @@
 package com.achesnovitskiy.octocattest2.domain
 
-import com.achesnovitskiy.octocattest2.api.ApiService
-import com.achesnovitskiy.octocattest2.data.Repo
-import com.achesnovitskiy.octocattest2.repos.di.ReposScope
+import com.achesnovitskiy.octocattest2.data.api.ApiService
+import com.achesnovitskiy.octocattest2.data.pojo.Repo
+import com.achesnovitskiy.octocattest2.ui.repos.di.ReposScope
 import io.reactivex.Single
 import javax.inject.Inject
 

@@ -1,6 +1,6 @@
-package com.achesnovitskiy.octocattest2.api
+package com.achesnovitskiy.octocattest2.data.api
 
-import com.achesnovitskiy.octocattest2.repos.di.ReposScope
+import com.achesnovitskiy.octocattest2.ui.repos.di.ReposScope
 import java.io.IOException
 import java.net.InetAddress
 import java.net.Socket

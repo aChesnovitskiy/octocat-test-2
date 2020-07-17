@@ -14,5 +14,8 @@ fun Activity.showKeyboard() {
 
 fun Activity.hideKeyboard() {
     (getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager)
-        .hideSoftInputFromWindow(window.decorView.windowToken, 0)
+        .hideSoftInputFromWindow(
+            window.decorView.windowToken,
+            0
+        )
 }

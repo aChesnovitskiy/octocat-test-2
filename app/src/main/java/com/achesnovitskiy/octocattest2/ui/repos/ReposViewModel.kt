@@ -1,8 +1,8 @@
-package com.achesnovitskiy.octocattest2.repos
+package com.achesnovitskiy.octocattest2.ui.repos
 
 import androidx.lifecycle.ViewModel
-import com.achesnovitskiy.octocattest2.data.Repo
-import com.achesnovitskiy.octocattest2.repos.di.ReposScope
+import com.achesnovitskiy.octocattest2.data.pojo.Repo
+import com.achesnovitskiy.octocattest2.ui.repos.di.ReposScope
 import com.achesnovitskiy.octocattest2.domain.Repository
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -26,7 +26,8 @@ interface ReposViewModel {
 }
 
 @ReposScope
-class ReposViewModelImpl @Inject constructor(userName: String, private val repository: Repository) : ViewModel(), ReposViewModel {
+class ReposViewModelImpl @Inject constructor(userName: String, private val repository: Repository) :
+    ViewModel(), ReposViewModel {
 
     private val reposBehaviorSubject: BehaviorSubject<List<Repo>> = BehaviorSubject.create()
 
@@ -78,14 +79,14 @@ class ReposViewModelImpl @Inject constructor(userName: String, private val repos
         updateState { it.copy(isSearch = isSearchMode) }
     }
 
+    override fun onCleared() {
+        disposable?.dispose()
+    }
+
     private fun updateState(update: (currentState: ReposState) -> ReposState) {
         val updatedState = update(reposStateBehaviorSubject.value!!)
 
         reposStateBehaviorSubject.onNext(updatedState)
-    }
-
-    override fun onCleared() {
-        disposable?.dispose()
     }
 }
 

@@ -1,10 +1,10 @@
-package com.achesnovitskiy.octocattest2.repoinfo.di
+package com.achesnovitskiy.octocattest2.ui.repoinfo.di
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelStoreOwner
-import com.achesnovitskiy.octocattest2.repoinfo.RepoInfoViewModel
-import com.achesnovitskiy.octocattest2.repoinfo.RepoInfoViewModelImpl
+import com.achesnovitskiy.octocattest2.ui.repoinfo.RepoInfoViewModel
+import com.achesnovitskiy.octocattest2.ui.repoinfo.RepoInfoViewModelImpl
 import dagger.Module
 import dagger.Provides
 
@@ -16,7 +16,10 @@ class RepoInfoModule(
 
     @Provides
     fun provideRepoInfoViewModel(): RepoInfoViewModel =
-        ViewModelProvider(viewModelStoreOwner, RepoInfoViewModelFactory(repoName))
+        ViewModelProvider(
+            viewModelStoreOwner,
+            RepoInfoViewModelFactory(repoName)
+        )
             .get(RepoInfoViewModelImpl::class.java)
 
     class RepoInfoViewModelFactory(private val repoName: String) :

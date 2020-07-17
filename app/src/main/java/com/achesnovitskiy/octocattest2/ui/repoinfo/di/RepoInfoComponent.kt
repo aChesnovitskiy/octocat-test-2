@@ -1,6 +1,6 @@
-package com.achesnovitskiy.octocattest2.repoinfo.di
+package com.achesnovitskiy.octocattest2.ui.repoinfo.di
 
-import com.achesnovitskiy.octocattest2.repoinfo.RepoInfoFragment
+import com.achesnovitskiy.octocattest2.ui.repoinfo.RepoInfoFragment
 import dagger.Subcomponent
 
 @RepoInfoScope

@@ -1,6 +1,6 @@
-package com.achesnovitskiy.octocattest2.api
+package com.achesnovitskiy.octocattest2.data.api
 
-import com.achesnovitskiy.octocattest2.data.Repo
+import com.achesnovitskiy.octocattest2.data.pojo.Repo
 import io.reactivex.Single
 
 interface ApiService {

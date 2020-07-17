@@ -1,8 +1,8 @@
-package com.achesnovitskiy.octocattest2.api
+package com.achesnovitskiy.octocattest2.data.api
 
 import android.os.Build
-import com.achesnovitskiy.octocattest2.data.Repo
-import com.achesnovitskiy.octocattest2.repos.di.ReposScope
+import com.achesnovitskiy.octocattest2.data.pojo.Repo
+import com.achesnovitskiy.octocattest2.ui.repos.di.ReposScope
 import com.jakewharton.retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import io.reactivex.Single
 import okhttp3.OkHttpClient
@@ -46,5 +46,3 @@ class RetrofitApiServiceImpl @Inject constructor(private val tlsSocketFactory: T
         private const val BASE_URL = "https://api.github.com/"
     }
 }
-
-

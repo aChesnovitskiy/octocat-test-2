@@ -1,13 +1,13 @@
-package com.achesnovitskiy.octocattest2.repos.di
+package com.achesnovitskiy.octocattest2.ui.repos.di
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelStoreOwner
-import com.achesnovitskiy.octocattest2.data.Repo
+import com.achesnovitskiy.octocattest2.data.pojo.Repo
 import com.achesnovitskiy.octocattest2.domain.Repository
-import com.achesnovitskiy.octocattest2.repos.ReposAdapter
-import com.achesnovitskiy.octocattest2.repos.ReposViewModel
-import com.achesnovitskiy.octocattest2.repos.ReposViewModelImpl
+import com.achesnovitskiy.octocattest2.ui.repos.ReposAdapter
+import com.achesnovitskiy.octocattest2.ui.repos.ReposViewModel
+import com.achesnovitskiy.octocattest2.ui.repos.ReposViewModelImpl
 import dagger.Module
 import dagger.Provides
 
@@ -19,11 +19,17 @@ class ReposModule(
 ) {
 
     @Provides
-    fun provideReposAdapter(): ReposAdapter = ReposAdapter(onItemClickListener)
+    fun provideReposAdapter(): ReposAdapter =
+        ReposAdapter(onItemClickListener)
 
     @Provides
     fun provideReposViewModel(repository: Repository): ReposViewModel =
-        ViewModelProvider(viewModelStoreOwner, ReposViewModelFactory(userName, repository))
+        ViewModelProvider(viewModelStoreOwner,
+            ReposViewModelFactory(
+                userName,
+                repository
+            )
+        )
             .get(ReposViewModelImpl::class.java)
 
     class ReposViewModelFactory(private val userName: String, private val repository: Repository) :
@@ -31,6 +37,9 @@ class ReposModule(
 
         @Suppress("UNCHECKED_CAST")
         override fun <T : ViewModel?> create(modelClass: Class<T>): T =
-            ReposViewModelImpl(userName, repository) as T
+            ReposViewModelImpl(
+                userName,
+                repository
+            ) as T
     }
 }

@@ -1,4 +1,4 @@
-package com.achesnovitskiy.octocattest2.data
+package com.achesnovitskiy.octocattest2.data.pojo
 
 data class Repo(
     val id: Int,
