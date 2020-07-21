@@ -14,6 +14,5 @@ interface RepoInfoViewModel {
 @RepoInfoScope
 class RepoInfoViewModelImpl @Inject constructor(repoName: String) : ViewModel(), RepoInfoViewModel {
 
-    override val repoNameObservable: Observable<String> =
-        BehaviorSubject.createDefault(repoName)
+    override val repoNameObservable: Observable<String> = BehaviorSubject.createDefault(repoName)
 }

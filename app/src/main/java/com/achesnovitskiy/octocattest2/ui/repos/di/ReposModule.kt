@@ -3,9 +3,7 @@ package com.achesnovitskiy.octocattest2.ui.repos.di
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelStoreOwner
-import com.achesnovitskiy.octocattest2.data.pojo.Repo
 import com.achesnovitskiy.octocattest2.domain.Repository
-import com.achesnovitskiy.octocattest2.ui.repos.ReposAdapter
 import com.achesnovitskiy.octocattest2.ui.repos.ReposViewModel
 import com.achesnovitskiy.octocattest2.ui.repos.ReposViewModelImpl
 import dagger.Module
@@ -14,13 +12,8 @@ import dagger.Provides
 @Module
 class ReposModule(
     private val viewModelStoreOwner: ViewModelStoreOwner,
-    private val userName: String,
-    private val onItemClickListener: (Repo) -> Unit
+    private val userName: String
 ) {
-
-    @Provides
-    fun provideReposAdapter(): ReposAdapter =
-        ReposAdapter(onItemClickListener)
 
     @Provides
     fun provideReposViewModel(repository: Repository): ReposViewModel =

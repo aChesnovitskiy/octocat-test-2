@@ -9,13 +9,10 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.achesnovitskiy.octocattest2.R
 import com.achesnovitskiy.octocattest2.data.pojo.Repo
-import com.achesnovitskiy.octocattest2.ui.repos.di.ReposScope
 import kotlinx.android.extensions.LayoutContainer
 import kotlinx.android.synthetic.main.item_repo.view.*
-import javax.inject.Inject
 
-@ReposScope
-class ReposAdapter @Inject constructor(private val onItemClickListener: (Repo) -> Unit) :
+class ReposAdapter (private val onItemClickListener: (Repo) -> Unit) :
     ListAdapter<Repo, RepoViewHolder>(
         ReposDiffCallback()
     ) {

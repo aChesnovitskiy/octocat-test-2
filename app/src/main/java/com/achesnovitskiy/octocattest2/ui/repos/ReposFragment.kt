@@ -12,12 +12,12 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.achesnovitskiy.octocattest2.app.App
 import com.achesnovitskiy.octocattest2.R
+import com.achesnovitskiy.octocattest2.app.App
+import com.achesnovitskiy.octocattest2.app.MainActivity
 import com.achesnovitskiy.octocattest2.data.pojo.Repo
 import com.achesnovitskiy.octocattest2.extensions.hideKeyboard
 import com.achesnovitskiy.octocattest2.extensions.showKeyboard
-import com.achesnovitskiy.octocattest2.app.MainActivity
 import com.achesnovitskiy.octocattest2.ui.repos.di.ReposModule
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
@@ -30,8 +30,9 @@ class ReposFragment : Fragment(R.layout.fragment_repos) {
     @Inject
     lateinit var reposViewModel: ReposViewModel
 
-    @Inject
-    lateinit var reposAdapter: ReposAdapter
+    private val reposAdapter: ReposAdapter by lazy(LazyThreadSafetyMode.NONE) {
+        ReposAdapter { repo -> navigateToInfo(repo) }
+    }
 
     private val rootActivity: MainActivity by lazy(LazyThreadSafetyMode.NONE) {
         activity as MainActivity
@@ -47,8 +48,7 @@ class ReposFragment : Fragment(R.layout.fragment_repos) {
             .reposModule(
                 ReposModule(
                     viewModelStoreOwner = this,
-                    userName = USER_OCTOCAT,
-                    onItemClickListener = { repo -> navigateToInfo(repo) }
+                    userName = USER_OCTOCAT
                 )
             )
             .build()
