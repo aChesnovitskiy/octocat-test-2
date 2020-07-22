@@ -5,9 +5,9 @@ import android.os.Build
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
-import android.view.View
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.DrawableCompat
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DividerItemDecoration
@@ -69,8 +69,7 @@ class ReposFragment : Fragment(R.layout.fragment_repos) {
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe { repos ->
-                repos_list_is_empty_text_view.visibility =
-                    if (repos.isNullOrEmpty()) View.VISIBLE else View.GONE
+                repos_list_is_empty_text_view.isVisible = repos.isNullOrEmpty()
 
                 reposAdapter.submitList(repos)
             }
@@ -147,21 +146,20 @@ class ReposFragment : Fragment(R.layout.fragment_repos) {
     }
 
     private fun bindState(state: ReposState) {
-        repos_progress_bar.visibility =
-            if (state.isLoading) View.VISIBLE else View.GONE
+        repos_progress_bar.isVisible = state.isLoading
 
         if (state.isSearch) {
-            repos_search_layout.visibility = View.VISIBLE
-            repos_search_button.visibility = View.GONE
-            repos_title.visibility = View.GONE
+            repos_search_layout.isVisible = true
+            repos_search_button.isVisible = false
+            repos_title.isVisible = false
 
             repos_search_edit_text.requestFocus()
 
             requireActivity().showKeyboard()
         } else {
-            repos_search_layout.visibility = View.GONE
-            repos_search_button.visibility = View.VISIBLE
-            repos_title.visibility = View.VISIBLE
+            repos_search_layout.isVisible = false
+            repos_search_button.isVisible = true
+            repos_title.isVisible = true
 
             repos_search_edit_text.text = null
 
