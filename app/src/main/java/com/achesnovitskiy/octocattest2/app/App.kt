@@ -6,8 +6,17 @@ import com.achesnovitskiy.octocattest2.app.di.DaggerAppComponent
 
 class App : MultiDexApplication() {
 
-    val appComponent: AppComponent by lazy {
-        DaggerAppComponent
+    companion object {
+        private var appComponentInstance: AppComponent? = null
+
+        val appComponent: AppComponent
+            get() = appComponentInstance!!
+    }
+
+    override fun onCreate() {
+        super.onCreate()
+
+        appComponentInstance = DaggerAppComponent
             .builder()
             .build()
     }

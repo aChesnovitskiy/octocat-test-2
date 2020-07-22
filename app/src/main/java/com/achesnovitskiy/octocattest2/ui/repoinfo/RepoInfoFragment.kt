@@ -3,8 +3,8 @@ package com.achesnovitskiy.octocattest2.ui.repoinfo
 import android.content.Context
 import android.os.Bundle
 import androidx.fragment.app.Fragment
-import com.achesnovitskiy.octocattest2.app.App
 import com.achesnovitskiy.octocattest2.R
+import com.achesnovitskiy.octocattest2.app.App.Companion.appComponent
 import com.achesnovitskiy.octocattest2.ui.repoinfo.di.RepoInfoModule
 import io.reactivex.disposables.Disposable
 import kotlinx.android.synthetic.main.fragment_repo_info.*
@@ -24,7 +24,7 @@ class RepoInfoFragment : Fragment(R.layout.fragment_repo_info) {
     override fun onAttach(context: Context) {
         super.onAttach(context)
 
-        (activity?.application as App).appComponent
+        appComponent
             .repoInfoComponent()
             .repoInfoModule(
                 RepoInfoModule(
@@ -39,7 +39,7 @@ class RepoInfoFragment : Fragment(R.layout.fragment_repo_info) {
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
 
-        repo_info_back_button.setOnClickListener { activity?.onBackPressed() }
+        repo_info_back_button.setOnClickListener { requireActivity().onBackPressed() }
     }
 
     override fun onResume() {

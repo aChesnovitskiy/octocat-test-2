@@ -13,8 +13,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.achesnovitskiy.octocattest2.R
-import com.achesnovitskiy.octocattest2.app.App
-import com.achesnovitskiy.octocattest2.app.MainActivity
+import com.achesnovitskiy.octocattest2.app.App.Companion.appComponent
 import com.achesnovitskiy.octocattest2.data.pojo.Repo
 import com.achesnovitskiy.octocattest2.extensions.hideKeyboard
 import com.achesnovitskiy.octocattest2.extensions.showKeyboard
@@ -34,16 +33,12 @@ class ReposFragment : Fragment(R.layout.fragment_repos) {
         ReposAdapter { repo -> navigateToInfo(repo) }
     }
 
-    private val rootActivity: MainActivity by lazy(LazyThreadSafetyMode.NONE) {
-        activity as MainActivity
-    }
-
     private val compositeDisposable = CompositeDisposable()
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
 
-        (rootActivity.application as App).appComponent
+        appComponent
             .reposComponent()
             .reposModule(
                 ReposModule(
@@ -96,7 +91,7 @@ class ReposFragment : Fragment(R.layout.fragment_repos) {
 
             DrawableCompat.setTint(
                 drawableProgress,
-                ContextCompat.getColor(rootActivity, R.color.color_accent)
+                ContextCompat.getColor(requireActivity(), R.color.color_accent)
             )
 
             repos_progress_bar.indeterminateDrawable = DrawableCompat.unwrap(drawableProgress)
@@ -162,7 +157,7 @@ class ReposFragment : Fragment(R.layout.fragment_repos) {
 
             repos_search_edit_text.requestFocus()
 
-            rootActivity.showKeyboard()
+            requireActivity().showKeyboard()
         } else {
             repos_search_layout.visibility = View.GONE
             repos_search_button.visibility = View.VISIBLE
@@ -170,7 +165,7 @@ class ReposFragment : Fragment(R.layout.fragment_repos) {
 
             repos_search_edit_text.text = null
 
-            rootActivity.hideKeyboard()
+            requireActivity().hideKeyboard()
         }
     }
 
