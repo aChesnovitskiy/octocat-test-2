@@ -7,10 +7,10 @@ import com.achesnovitskiy.octocattest2.app.di.DaggerAppComponent
 class App : MultiDexApplication() {
 
     companion object {
-        private var appComponentInstance: AppComponent? = null
+        lateinit var appComponentInstance: AppComponent
 
         val appComponent: AppComponent
-            get() = appComponentInstance!!
+            get() = appComponentInstance
     }
 
     override fun onCreate() {
