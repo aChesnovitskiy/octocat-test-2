@@ -33,7 +33,7 @@ class ReposFragment : Fragment(R.layout.fragment_repos) {
         ReposAdapter { repo -> navigateToInfo(repo) }
     }
 
-    private val compositeDisposable = CompositeDisposable()
+    private var compositeDisposable: CompositeDisposable? = null
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -61,23 +61,28 @@ class ReposFragment : Fragment(R.layout.fragment_repos) {
     override fun onResume() {
         super.onResume()
 
-        reposViewModel.reposStateBehaviorSubject
-            .subscribe(::bindState)
-            .let(compositeDisposable::add)
+        compositeDisposable = CompositeDisposable(
+            reposViewModel.reposStateBehaviorSubject
+                .subscribe(::bindState),
+            reposViewModel.reposWithSearchObservable
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe { repos ->
+                    repos_list_is_empty_text_view.isVisible = repos.isNullOrEmpty()
 
-        reposViewModel.reposWithSearchObservable
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe { repos ->
-                repos_list_is_empty_text_view.isVisible = repos.isNullOrEmpty()
+                    reposAdapter.submitList(repos)
+                }
+        )
+    }
 
-                reposAdapter.submitList(repos)
-            }
-            .let(compositeDisposable::add)
+    override fun onPause() {
+        compositeDisposable?.dispose()
+
+        super.onPause()
     }
 
     override fun onDestroy() {
-        compositeDisposable.dispose()
+        compositeDisposable?.dispose()
 
         super.onDestroy()
     }
