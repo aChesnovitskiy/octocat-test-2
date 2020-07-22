@@ -16,6 +16,7 @@ class ReposModule(
 ) {
 
     @Provides
+    @ReposScope
     fun provideReposViewModel(repository: Repository): ReposViewModel =
         ViewModelProvider(viewModelStoreOwner,
             ReposViewModelFactory(

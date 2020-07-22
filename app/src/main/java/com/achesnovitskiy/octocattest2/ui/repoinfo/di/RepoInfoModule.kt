@@ -15,6 +15,7 @@ class RepoInfoModule(
 ) {
 
     @Provides
+    @RepoInfoScope
     fun provideRepoInfoViewModel(): RepoInfoViewModel =
         ViewModelProvider(
             viewModelStoreOwner,

@@ -2,7 +2,6 @@ package com.achesnovitskiy.octocattest2.ui.repos
 
 import androidx.lifecycle.ViewModel
 import com.achesnovitskiy.octocattest2.data.pojo.Repo
-import com.achesnovitskiy.octocattest2.ui.repos.di.ReposScope
 import com.achesnovitskiy.octocattest2.domain.Repository
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -25,7 +24,6 @@ interface ReposViewModel {
     fun onSearchModeChange(isSearchMode: Boolean)
 }
 
-@ReposScope
 class ReposViewModelImpl @Inject constructor(userName: String, private val repository: Repository) :
     ViewModel(), ReposViewModel {
 
