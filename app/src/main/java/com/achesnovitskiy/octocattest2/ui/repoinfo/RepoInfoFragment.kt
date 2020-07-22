@@ -4,7 +4,6 @@ import android.content.Context
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import com.achesnovitskiy.octocattest2.R
-import com.achesnovitskiy.octocattest2.app.App.Companion.appComponent
 import com.achesnovitskiy.octocattest2.ui.repoinfo.di.DaggerRepoInfoComponent
 import com.achesnovitskiy.octocattest2.ui.repoinfo.di.RepoInfoComponent
 import com.achesnovitskiy.octocattest2.ui.repoinfo.di.RepoInfoModule
@@ -30,11 +29,10 @@ class RepoInfoFragment : Fragment(R.layout.fragment_repo_info) {
 
         repoInfoComponent = DaggerRepoInfoComponent
             .builder()
-            .appComponent(appComponent)
             .repoInfoModule(
                 RepoInfoModule(
-                    this,
-                    repoName
+                    viewModelStoreOwner = this,
+                    repoName = repoName
                 )
             )
             .build()
