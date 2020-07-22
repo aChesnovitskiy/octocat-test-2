@@ -17,6 +17,8 @@ import com.achesnovitskiy.octocattest2.app.App.Companion.appComponent
 import com.achesnovitskiy.octocattest2.data.pojo.Repo
 import com.achesnovitskiy.octocattest2.extensions.hideKeyboard
 import com.achesnovitskiy.octocattest2.extensions.showKeyboard
+import com.achesnovitskiy.octocattest2.ui.repos.di.DaggerReposComponent
+import com.achesnovitskiy.octocattest2.ui.repos.di.ReposComponent
 import com.achesnovitskiy.octocattest2.ui.repos.di.ReposModule
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
@@ -29,6 +31,8 @@ class ReposFragment : Fragment(R.layout.fragment_repos) {
     @Inject
     lateinit var reposViewModel: ReposViewModel
 
+    lateinit var reposComponent: ReposComponent
+
     private val reposAdapter: ReposAdapter by lazy(LazyThreadSafetyMode.NONE) {
         ReposAdapter { repo -> navigateToInfo(repo) }
     }
@@ -38,8 +42,9 @@ class ReposFragment : Fragment(R.layout.fragment_repos) {
     override fun onAttach(context: Context) {
         super.onAttach(context)
 
-        appComponent
-            .reposComponent()
+        reposComponent = DaggerReposComponent
+            .builder()
+            .appComponent(appComponent)
             .reposModule(
                 ReposModule(
                     viewModelStoreOwner = this,
@@ -47,7 +52,8 @@ class ReposFragment : Fragment(R.layout.fragment_repos) {
                 )
             )
             .build()
-            .inject(this)
+
+        reposComponent.inject(this)
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {

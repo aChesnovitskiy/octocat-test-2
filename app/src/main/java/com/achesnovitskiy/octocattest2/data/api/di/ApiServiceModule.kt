@@ -9,11 +9,13 @@ import dagger.Provides
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import javax.inject.Singleton
 
 @Module
 class ApiServiceModule {
 
     @Provides
+    @Singleton
     fun provideOkHttpClient(tlsSocketFactory: TLSSocketFactory): OkHttpClient =
         OkHttpClient.Builder()
             .let {
@@ -26,6 +28,7 @@ class ApiServiceModule {
             .build()
 
     @Provides
+    @Singleton
     fun provideRetrofit(okHttpClient: OkHttpClient): Retrofit =
         Retrofit.Builder()
             .baseUrl(BASE_URL)
@@ -35,6 +38,7 @@ class ApiServiceModule {
             .build()
 
     @Provides
+    @Singleton
     fun provideApiService(retrofit: Retrofit): ApiService = retrofit.create(ApiService::class.java)
 
     companion object {

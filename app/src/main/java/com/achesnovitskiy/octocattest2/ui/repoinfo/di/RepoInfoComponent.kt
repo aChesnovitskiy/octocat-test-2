@@ -1,19 +1,12 @@
 package com.achesnovitskiy.octocattest2.ui.repoinfo.di
 
+import com.achesnovitskiy.octocattest2.app.di.AppComponent
 import com.achesnovitskiy.octocattest2.ui.repoinfo.RepoInfoFragment
-import dagger.Subcomponent
+import dagger.Component
 
 @RepoInfoScope
-@Subcomponent(modules = [RepoInfoModule::class])
+@Component(dependencies = [AppComponent::class], modules = [RepoInfoModule::class])
 interface RepoInfoComponent {
-
-    @Subcomponent.Builder
-    interface Builder {
-
-        fun repoInfoModule(repoInfoModule: RepoInfoModule): Builder
-
-        fun build(): RepoInfoComponent
-    }
 
     fun inject(fragment: RepoInfoFragment)
 }
