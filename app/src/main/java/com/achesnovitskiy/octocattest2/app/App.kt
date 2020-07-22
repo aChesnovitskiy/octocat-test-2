@@ -2,6 +2,7 @@ package com.achesnovitskiy.octocattest2.app
 
 import androidx.multidex.MultiDexApplication
 import com.achesnovitskiy.octocattest2.app.di.AppComponent
+import com.achesnovitskiy.octocattest2.app.di.AppModule
 import com.achesnovitskiy.octocattest2.app.di.DaggerAppComponent
 
 class App : MultiDexApplication() {
@@ -18,6 +19,9 @@ class App : MultiDexApplication() {
 
         appComponentInstance = DaggerAppComponent
             .builder()
+            .appModule(
+                AppModule(context = this)
+            )
             .build()
     }
 }
