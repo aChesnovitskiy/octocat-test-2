@@ -5,7 +5,7 @@ import com.achesnovitskiy.octocattest2.data.pojo.Repo
 import com.achesnovitskiy.octocattest2.domain.Repository
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.disposables.Disposable
+import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.functions.BiFunction
 import io.reactivex.schedulers.Schedulers
 import io.reactivex.subjects.BehaviorSubject
@@ -16,6 +16,8 @@ interface ReposViewModel {
     val reposWithSearchObservable: Observable<List<Repo>>
 
     val reposStateBehaviorSubject: BehaviorSubject<ReposState>
+
+    fun getReposFromDataBase()
 
     fun onReposFromApiRequest(userName: String)
 
@@ -31,7 +33,7 @@ class ReposViewModelImpl @Inject constructor(userName: String, private val repos
 
     private val searchQueryBehaviorSubject: BehaviorSubject<String> = BehaviorSubject.create()
 
-    private var disposable: Disposable? = null
+    private val compositeDisposable = CompositeDisposable()
 
     override val reposWithSearchObservable: Observable<List<Repo>> = Observable
         .combineLatest(
@@ -53,20 +55,36 @@ class ReposViewModelImpl @Inject constructor(userName: String, private val repos
         )
 
     init {
+        getReposFromDataBase()
         onReposFromApiRequest(userName)
+    }
+
+    override fun getReposFromDataBase() {
+        compositeDisposable.add(
+            repository.getReposFromDatabase()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe { reposFromDatabase ->
+                    reposBehaviorSubject.onNext(reposFromDatabase)
+                }
+        )
     }
 
     override fun onReposFromApiRequest(userName: String) {
         updateState { it.copy(isLoading = true) }
 
-        disposable = repository.getReposByUser(userName)
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe { reposFromApi ->
-                reposBehaviorSubject.onNext(reposFromApi)
+        compositeDisposable.add(
+            repository.getReposFromApi(userName)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe { reposFromApi ->
+                    reposBehaviorSubject.onNext(reposFromApi)
 
-                updateState { it.copy(isLoading = false) }
-            }
+                    repository.insertReposToDatabase(reposFromApi)
+
+                    updateState { it.copy(isLoading = false) }
+                }
+        )
     }
 
     override fun onSearchQuery(query: String?) {
@@ -78,7 +96,7 @@ class ReposViewModelImpl @Inject constructor(userName: String, private val repos
     }
 
     override fun onCleared() {
-        disposable?.dispose()
+        if (compositeDisposable.size() > 0) compositeDisposable.dispose()
     }
 
     private fun updateState(update: (currentState: ReposState) -> ReposState) {

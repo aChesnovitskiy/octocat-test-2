@@ -31,7 +31,7 @@ class ReposFragment : Fragment(R.layout.fragment_repos) {
     @Inject
     lateinit var reposViewModel: ReposViewModel
 
-    lateinit var reposComponent: ReposComponent
+    private lateinit var reposComponent: ReposComponent
 
     private val reposAdapter: ReposAdapter by lazy(LazyThreadSafetyMode.NONE) {
         ReposAdapter { repo -> navigateToInfo(repo) }
