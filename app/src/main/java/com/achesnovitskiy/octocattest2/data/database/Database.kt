@@ -8,7 +8,7 @@ import com.achesnovitskiy.octocattest2.data.pojo.Repo
     entities = [Repo::class],
     version = 1
 )
-abstract class ReposDatabase : RoomDatabase() {
+abstract class Database : RoomDatabase() {
 
     abstract val reposDao: ReposDao
 }

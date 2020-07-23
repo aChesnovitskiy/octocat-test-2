@@ -2,29 +2,29 @@ package com.achesnovitskiy.octocattest2.data.database.di
 
 import android.content.Context
 import androidx.room.Room
-import com.achesnovitskiy.octocattest2.data.database.ReposDatabase
+import com.achesnovitskiy.octocattest2.data.database.Database
 import dagger.Module
 import dagger.Provides
 import javax.inject.Singleton
 
 @Module
-class ReposDatabaseModule {
+class DatabaseModule {
 
     @Provides
     @Singleton
-    fun provideReposDatabase(context: Context): ReposDatabase =
+    fun provideDatabase(context: Context): Database =
         Room.databaseBuilder(
             context,
-            ReposDatabase::class.java,
+            Database::class.java,
             DATABASE_NAME
         )
             .build()
 
     @Provides
     @Singleton
-    fun provideRepoDao(reposDatabase: ReposDatabase) = reposDatabase.reposDao
+    fun provideRepoDao(database: Database) = database.reposDao
 
     companion object {
-        const val DATABASE_NAME = "repos.db"
+        const val DATABASE_NAME = "database.db"
     }
 }
