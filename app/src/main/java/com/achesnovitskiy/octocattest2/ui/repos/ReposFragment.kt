@@ -76,7 +76,7 @@ class ReposFragment : Fragment(R.layout.fragment_repos) {
                 .subscribe { repos ->
                     repos_list_is_empty_text_view.isVisible = repos.isNullOrEmpty()
 
-                    reposAdapter.submitList(repos)
+                    reposAdapter.submitList(repos.sortedBy { it.name })
                 }
         )
     }
