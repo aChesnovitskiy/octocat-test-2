@@ -11,29 +11,22 @@ import dagger.Provides
 
 @Module
 class ReposModule(
-    private val viewModelStoreOwner: ViewModelStoreOwner,
-    private val userName: String
+    private val viewModelStoreOwner: ViewModelStoreOwner
 ) {
 
     @Provides
     @ReposScope
     fun provideReposViewModel(repository: Repository): ReposViewModel =
-        ViewModelProvider(viewModelStoreOwner,
-            ReposViewModelFactory(
-                userName,
-                repository
-            )
-        )
-            .get(ReposViewModelImpl::class.java)
+        ViewModelProvider(
+            viewModelStoreOwner,
+            ReposViewModelFactory(repository)
+        ).get(ReposViewModelImpl::class.java)
 
-    class ReposViewModelFactory(private val userName: String, private val repository: Repository) :
+    class ReposViewModelFactory(private val repository: Repository) :
         ViewModelProvider.NewInstanceFactory() {
 
         @Suppress("UNCHECKED_CAST")
         override fun <T : ViewModel?> create(modelClass: Class<T>): T =
-            ReposViewModelImpl(
-                userName,
-                repository
-            ) as T
+            ReposViewModelImpl(repository) as T
     }
 }

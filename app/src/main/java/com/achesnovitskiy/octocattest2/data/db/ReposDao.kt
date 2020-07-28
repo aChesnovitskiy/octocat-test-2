@@ -15,4 +15,7 @@ interface ReposDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertRepos(repos: List<Repo>)
+
+    @Query("DELETE FROM repo")
+    fun clearRepos()
 }

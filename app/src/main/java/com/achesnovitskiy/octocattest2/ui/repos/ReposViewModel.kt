@@ -15,18 +15,18 @@ interface ReposViewModel {
 
     val reposWithSearchObservable: Observable<List<Repo>>
 
-    val reposStateBehaviorSubject: BehaviorSubject<ReposState>
+    val reposStateObservable: Observable<ReposState>
 
     fun getReposFromDataBase()
 
-    fun onReposFromApiRequest(userName: String)
+    fun onReposFromApiRequest()
 
     fun onSearchQuery(query: String?)
 
     fun onSearchModeChange(isSearchMode: Boolean)
 }
 
-class ReposViewModelImpl @Inject constructor(userName: String, private val repository: Repository) :
+class ReposViewModelImpl @Inject constructor(private val repository: Repository) :
     ViewModel(), ReposViewModel {
 
     private val reposBehaviorSubject: BehaviorSubject<List<Repo>> = BehaviorSubject.create()
@@ -46,7 +46,7 @@ class ReposViewModelImpl @Inject constructor(userName: String, private val repos
             }
         )
 
-    override val reposStateBehaviorSubject: BehaviorSubject<ReposState> =
+    override val reposStateObservable: BehaviorSubject<ReposState> =
         BehaviorSubject.createDefault(
             ReposState(
                 isSearch = false,
@@ -56,7 +56,7 @@ class ReposViewModelImpl @Inject constructor(userName: String, private val repos
 
     init {
         getReposFromDataBase()
-        onReposFromApiRequest(userName)
+        onReposFromApiRequest()
     }
 
     override fun getReposFromDataBase() {
@@ -70,11 +70,11 @@ class ReposViewModelImpl @Inject constructor(userName: String, private val repos
         )
     }
 
-    override fun onReposFromApiRequest(userName: String) {
+    override fun onReposFromApiRequest() {
         updateState { it.copy(isLoading = true) }
 
         compositeDisposable.add(
-            repository.getReposFromApi(userName)
+            repository.getReposFromApi()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe { reposFromApi ->
@@ -100,9 +100,9 @@ class ReposViewModelImpl @Inject constructor(userName: String, private val repos
     }
 
     private fun updateState(update: (currentState: ReposState) -> ReposState) {
-        val updatedState = update(reposStateBehaviorSubject.value!!)
+        val updatedState = update(reposStateObservable.value!!)
 
-        reposStateBehaviorSubject.onNext(updatedState)
+        reposStateObservable.onNext(updatedState)
     }
 }
 

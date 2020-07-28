@@ -18,7 +18,6 @@ import com.achesnovitskiy.octocattest2.data.pojo.Repo
 import com.achesnovitskiy.octocattest2.extensions.hideKeyboard
 import com.achesnovitskiy.octocattest2.extensions.showKeyboard
 import com.achesnovitskiy.octocattest2.ui.repos.di.DaggerReposComponent
-import com.achesnovitskiy.octocattest2.ui.repos.di.ReposComponent
 import com.achesnovitskiy.octocattest2.ui.repos.di.ReposModule
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
@@ -31,8 +30,6 @@ class ReposFragment : Fragment(R.layout.fragment_repos) {
     @Inject
     lateinit var reposViewModel: ReposViewModel
 
-    private lateinit var reposComponent: ReposComponent
-
     private val reposAdapter: ReposAdapter by lazy(LazyThreadSafetyMode.NONE) {
         ReposAdapter { repo -> navigateToInfo(repo) }
     }
@@ -42,18 +39,14 @@ class ReposFragment : Fragment(R.layout.fragment_repos) {
     override fun onAttach(context: Context) {
         super.onAttach(context)
 
-        reposComponent = DaggerReposComponent
+        DaggerReposComponent
             .builder()
             .appComponent(appComponent)
             .reposModule(
-                ReposModule(
-                    viewModelStoreOwner = this,
-                    userName = USER_OCTOCAT
-                )
+                ReposModule(viewModelStoreOwner = this)
             )
             .build()
-
-        reposComponent.inject(this)
+            .inject(this)
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
@@ -68,7 +61,7 @@ class ReposFragment : Fragment(R.layout.fragment_repos) {
         super.onResume()
 
         compositeDisposable = CompositeDisposable(
-            reposViewModel.reposStateBehaviorSubject
+            reposViewModel.reposStateObservable
                 .subscribe(::bindState),
             reposViewModel.reposWithSearchObservable
                 .subscribeOn(Schedulers.io())
@@ -150,7 +143,7 @@ class ReposFragment : Fragment(R.layout.fragment_repos) {
         }
 
         repos_swipe_refresh_layout.setOnRefreshListener {
-            reposViewModel.onReposFromApiRequest(USER_OCTOCAT)
+            reposViewModel.onReposFromApiRequest()
 
             repos_swipe_refresh_layout.isRefreshing = false
         }
@@ -183,9 +176,5 @@ class ReposFragment : Fragment(R.layout.fragment_repos) {
             .navigate(
                 ReposFragmentDirections.actionRepositoriesFragmentToRepoInfoFragment(repo.name)
             )
-    }
-
-    companion object {
-        const val USER_OCTOCAT = "octocat"
     }
 }

@@ -10,7 +10,7 @@ import io.reactivex.schedulers.Schedulers
 import javax.inject.Inject
 
 interface Repository {
-    fun getReposFromApi(userName: String): Single<List<Repo>>
+    fun getReposFromApi(): Single<List<Repo>>
 
     fun getReposFromDatabase(): Single<List<Repo>>
 
@@ -20,18 +20,20 @@ interface Repository {
 class RepositoryImpl @Inject constructor(
     private val api: Api,
     private val db: Db
-): Repository {
+) : Repository {
 
-    override fun getReposFromApi(userName: String): Single<List<Repo>> =
-        api.getReposByUser(userName)
+    override fun getReposFromApi(): Single<List<Repo>> = api.getReposByUser(USER_OCTOCAT)
 
-    override fun getReposFromDatabase(): Single<List<Repo>> =
-        db.reposDao.getRepos()
+    override fun getReposFromDatabase(): Single<List<Repo>> = db.reposDao.getRepos()
 
     override fun insertReposToDatabase(repos: List<Repo>) {
         Completable.fromAction { db.reposDao.insertRepos(repos) }
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe()
+    }
+
+    companion object {
+        const val USER_OCTOCAT = "octocat"
     }
 }

@@ -5,7 +5,6 @@ import android.os.Bundle
 import androidx.fragment.app.Fragment
 import com.achesnovitskiy.octocattest2.R
 import com.achesnovitskiy.octocattest2.ui.repoinfo.di.DaggerRepoInfoComponent
-import com.achesnovitskiy.octocattest2.ui.repoinfo.di.RepoInfoComponent
 import com.achesnovitskiy.octocattest2.ui.repoinfo.di.RepoInfoModule
 import io.reactivex.disposables.Disposable
 import kotlinx.android.synthetic.main.fragment_repo_info.*
@@ -16,8 +15,6 @@ class RepoInfoFragment : Fragment(R.layout.fragment_repo_info) {
     @Inject
     lateinit var repoInfoViewModel: RepoInfoViewModel
 
-    lateinit var repoInfoComponent: RepoInfoComponent
-
     private val repoName: String by lazy(LazyThreadSafetyMode.NONE) {
         arguments?.get("repo_name") as String
     }
@@ -27,7 +24,7 @@ class RepoInfoFragment : Fragment(R.layout.fragment_repo_info) {
     override fun onAttach(context: Context) {
         super.onAttach(context)
 
-        repoInfoComponent = DaggerRepoInfoComponent
+        DaggerRepoInfoComponent
             .builder()
             .repoInfoModule(
                 RepoInfoModule(
@@ -36,8 +33,7 @@ class RepoInfoFragment : Fragment(R.layout.fragment_repo_info) {
                 )
             )
             .build()
-
-        repoInfoComponent.inject(this)
+            .inject(this)
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
