@@ -5,13 +5,13 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import com.achesnovitskiy.octocattest2.data.pojo.Repo
-import io.reactivex.Single
+import io.reactivex.Observable
 
 @Dao
 interface ReposDao {
 
     @Query("SELECT * FROM repo")
-    fun getRepos(): Single<List<Repo>>
+    fun getRepos(): Observable<List<Repo>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertRepos(repos: List<Repo>)

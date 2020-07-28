@@ -143,7 +143,7 @@ class ReposFragment : Fragment(R.layout.fragment_repos) {
         }
 
         repos_swipe_refresh_layout.setOnRefreshListener {
-            reposViewModel.onReposFromApiRequest()
+            reposViewModel.onRefresh()
 
             repos_swipe_refresh_layout.isRefreshing = false
         }

@@ -17,9 +17,7 @@ interface ReposViewModel {
 
     val reposStateObservable: Observable<ReposState>
 
-    fun getReposFromDataBase()
-
-    fun onReposFromApiRequest()
+    fun onRefresh()
 
     fun onSearchQuery(query: String?)
 
@@ -33,7 +31,7 @@ class ReposViewModelImpl @Inject constructor(private val repository: Repository)
 
     private val searchQueryBehaviorSubject: BehaviorSubject<String> = BehaviorSubject.create()
 
-    private val compositeDisposable = CompositeDisposable()
+    private var compositeDisposable = CompositeDisposable()
 
     override val reposWithSearchObservable: Observable<List<Repo>> = Observable
         .combineLatest(
@@ -55,33 +53,26 @@ class ReposViewModelImpl @Inject constructor(private val repository: Repository)
         )
 
     init {
-        getReposFromDataBase()
-        onReposFromApiRequest()
-    }
-
-    override fun getReposFromDataBase() {
         compositeDisposable.add(
-            repository.getReposFromDatabase()
+            repository.reposFromDb
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe { reposFromDatabase ->
-                    reposBehaviorSubject.onNext(reposFromDatabase)
+                .subscribe { repos ->
+                    reposBehaviorSubject.onNext(repos)
                 }
         )
+
+        onRefresh()
     }
 
-    override fun onReposFromApiRequest() {
+    override fun onRefresh() {
         updateState { it.copy(isLoading = true) }
 
         compositeDisposable.add(
-            repository.getReposFromApi()
+            repository.refreshDb()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe { reposFromApi ->
-                    reposBehaviorSubject.onNext(reposFromApi)
-
-                    repository.insertReposToDatabase(reposFromApi)
-
+                .subscribe {
                     updateState { it.copy(isLoading = false) }
                 }
         )
