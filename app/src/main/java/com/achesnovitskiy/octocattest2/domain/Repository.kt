@@ -1,7 +1,7 @@
 package com.achesnovitskiy.octocattest2.domain
 
 import com.achesnovitskiy.octocattest2.data.api.Api
-import com.achesnovitskiy.octocattest2.data.database.ReposDao
+import com.achesnovitskiy.octocattest2.data.db.Db
 import com.achesnovitskiy.octocattest2.data.pojo.Repo
 import io.reactivex.Completable
 import io.reactivex.Single
@@ -19,17 +19,17 @@ interface Repository {
 
 class RepositoryImpl @Inject constructor(
     private val api: Api,
-    private val reposDao: ReposDao
+    private val db: Db
 ): Repository {
 
     override fun getReposFromApi(userName: String): Single<List<Repo>> =
         api.getReposByUser(userName)
 
     override fun getReposFromDatabase(): Single<List<Repo>> =
-        reposDao.getRepos()
+        db.reposDao.getRepos()
 
     override fun insertReposToDatabase(repos: List<Repo>) {
-        Completable.fromAction { reposDao.insertRepos(repos) }
+        Completable.fromAction { db.reposDao.insertRepos(repos) }
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe()

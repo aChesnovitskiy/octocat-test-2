@@ -8,16 +8,14 @@ import com.achesnovitskiy.octocattest2.app.di.DaggerAppComponent
 class App : MultiDexApplication() {
 
     companion object {
-        lateinit var appComponentInstance: AppComponent
-
-        val appComponent: AppComponent
-            get() = appComponentInstance
+        lateinit var appComponent: AppComponent
+            private set
     }
 
     override fun onCreate() {
         super.onCreate()
 
-        appComponentInstance = DaggerAppComponent
+        appComponent = DaggerAppComponent
             .builder()
             .appModule(
                 AppModule(context = this)
