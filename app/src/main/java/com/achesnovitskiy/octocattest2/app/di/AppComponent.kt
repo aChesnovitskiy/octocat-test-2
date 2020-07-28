@@ -1,8 +1,8 @@
 package com.achesnovitskiy.octocattest2.app.di
 
 import android.content.Context
-import com.achesnovitskiy.octocattest2.data.api.ApiService
-import com.achesnovitskiy.octocattest2.data.api.di.ApiServiceModule
+import com.achesnovitskiy.octocattest2.data.api.Api
+import com.achesnovitskiy.octocattest2.data.api.di.ApiModule
 import com.achesnovitskiy.octocattest2.data.database.di.DatabaseModule
 import com.achesnovitskiy.octocattest2.domain.Repository
 import com.achesnovitskiy.octocattest2.domain.di.RepositoryModule
@@ -14,7 +14,7 @@ import javax.inject.Singleton
     modules = [
         AppModule::class,
         RepositoryModule::class,
-        ApiServiceModule::class,
+        ApiModule::class,
         DatabaseModule::class
     ]
 )
@@ -24,5 +24,5 @@ interface AppComponent {
 
     val repository: Repository
 
-    val apiService: ApiService
+    val api: Api
 }

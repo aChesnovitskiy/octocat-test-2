@@ -5,7 +5,7 @@ import io.reactivex.Single
 import retrofit2.http.GET
 import retrofit2.http.Path
 
-interface ApiService {
+interface Api {
 
     @GET("users/{username}/repos")
     fun getReposByUser(@Path("username") userName: String): Single<List<Repo>>

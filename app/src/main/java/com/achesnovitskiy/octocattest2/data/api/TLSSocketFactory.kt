@@ -7,12 +7,9 @@ import java.security.KeyStore
 import java.security.KeyStoreException
 import java.security.NoSuchAlgorithmException
 import java.util.*
-import javax.inject.Inject
-import javax.inject.Singleton
 import javax.net.ssl.*
 
-@Singleton
-class TLSSocketFactory @Inject constructor() : SSLSocketFactory() {
+class TLSSocketFactory: SSLSocketFactory() {
 
     private val delegate: SSLSocketFactory
 

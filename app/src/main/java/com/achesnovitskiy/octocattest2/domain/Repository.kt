@@ -1,6 +1,6 @@
 package com.achesnovitskiy.octocattest2.domain
 
-import com.achesnovitskiy.octocattest2.data.api.ApiService
+import com.achesnovitskiy.octocattest2.data.api.Api
 import com.achesnovitskiy.octocattest2.data.database.ReposDao
 import com.achesnovitskiy.octocattest2.data.pojo.Repo
 import io.reactivex.Completable
@@ -18,12 +18,12 @@ interface Repository {
 }
 
 class RepositoryImpl @Inject constructor(
-    private val apiService: ApiService,
+    private val api: Api,
     private val reposDao: ReposDao
 ): Repository {
 
     override fun getReposFromApi(userName: String): Single<List<Repo>> =
-        apiService.getReposByUser(userName)
+        api.getReposByUser(userName)
 
     override fun getReposFromDatabase(): Single<List<Repo>> =
         reposDao.getRepos()
