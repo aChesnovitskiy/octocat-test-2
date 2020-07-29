@@ -9,7 +9,6 @@ import android.view.View
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.DrawableCompat
 import androidx.core.view.isVisible
-import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -18,16 +17,16 @@ import com.achesnovitskiy.octocattest2.app.App.Companion.appComponent
 import com.achesnovitskiy.octocattest2.data.pojo.Repo
 import com.achesnovitskiy.octocattest2.extensions.hideKeyboard
 import com.achesnovitskiy.octocattest2.extensions.showKeyboard
+import com.achesnovitskiy.octocattest2.ui.base.BaseFragment
 import com.achesnovitskiy.octocattest2.ui.repos.di.DaggerReposComponent
 import com.achesnovitskiy.octocattest2.ui.repos.di.ReposModule
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.fragment_repos.*
 import javax.inject.Inject
 
-class ReposFragment : Fragment(R.layout.fragment_repos) {
+class ReposFragment : BaseFragment(R.layout.fragment_repos) {
 
     @Inject
     lateinit var reposViewModel: ReposViewModel
@@ -35,8 +34,6 @@ class ReposFragment : Fragment(R.layout.fragment_repos) {
     private val reposAdapter: ReposAdapter by lazy(LazyThreadSafetyMode.NONE) {
         ReposAdapter { repo -> navigateToInfo(repo) }
     }
-
-    private var disposable: Disposable? = null
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -72,18 +69,6 @@ class ReposFragment : Fragment(R.layout.fragment_repos) {
                     reposAdapter.submitList(repos.sortedBy { it.name })
                 }
         )
-    }
-
-    override fun onPause() {
-        disposable?.dispose()
-
-        super.onPause()
-    }
-
-    override fun onDestroy() {
-        disposable?.dispose()
-
-        super.onDestroy()
     }
 
     /**
