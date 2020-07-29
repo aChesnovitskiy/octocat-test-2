@@ -5,6 +5,7 @@ import android.os.Build
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
+import android.view.View
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.DrawableCompat
 import androidx.core.view.isVisible
@@ -21,6 +22,7 @@ import com.achesnovitskiy.octocattest2.ui.repos.di.DaggerReposComponent
 import com.achesnovitskiy.octocattest2.ui.repos.di.ReposModule
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.fragment_repos.*
 import javax.inject.Inject
@@ -34,7 +36,7 @@ class ReposFragment : Fragment(R.layout.fragment_repos) {
         ReposAdapter { repo -> navigateToInfo(repo) }
     }
 
-    private var compositeDisposable: CompositeDisposable? = null
+    private var disposable: Disposable? = null
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -49,10 +51,8 @@ class ReposFragment : Fragment(R.layout.fragment_repos) {
             .inject(this)
     }
 
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
-
-        setupProgressBar()
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        setProgressBarColorForPreLollipop()
         setupSearchView()
         setupRecyclerView()
     }
@@ -60,7 +60,7 @@ class ReposFragment : Fragment(R.layout.fragment_repos) {
     override fun onResume() {
         super.onResume()
 
-        compositeDisposable = CompositeDisposable(
+        disposable = CompositeDisposable(
             reposViewModel.reposStateObservable
                 .subscribe(::bindState),
             reposViewModel.reposWithSearchObservable
@@ -75,19 +75,21 @@ class ReposFragment : Fragment(R.layout.fragment_repos) {
     }
 
     override fun onPause() {
-        compositeDisposable?.dispose()
+        disposable?.dispose()
 
         super.onPause()
     }
 
     override fun onDestroy() {
-        compositeDisposable?.dispose()
+        disposable?.dispose()
 
         super.onDestroy()
     }
 
-    private fun setupProgressBar() {
-        // Set progress bar color for pre-lollipop devices
+    /**
+     * Set progress bar color for pre-lollipop devices
+     */
+    private fun setProgressBarColorForPreLollipop() {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
             val drawableProgress =
                 DrawableCompat.wrap(repos_progress_bar.indeterminateDrawable)
@@ -103,11 +105,11 @@ class ReposFragment : Fragment(R.layout.fragment_repos) {
 
     private fun setupSearchView() {
         repos_search_button.setOnClickListener {
-            reposViewModel.onSearchModeChange(true)
+            reposViewModel.onSearchToggle(true)
         }
 
         repos_search_back_button.setOnClickListener {
-            reposViewModel.onSearchModeChange(false)
+            reposViewModel.onSearchToggle(false)
         }
 
         repos_search_close_button.setOnClickListener {

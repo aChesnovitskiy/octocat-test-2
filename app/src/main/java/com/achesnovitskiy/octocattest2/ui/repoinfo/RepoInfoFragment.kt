@@ -2,6 +2,7 @@ package com.achesnovitskiy.octocattest2.ui.repoinfo
 
 import android.content.Context
 import android.os.Bundle
+import android.view.View
 import androidx.fragment.app.Fragment
 import com.achesnovitskiy.octocattest2.R
 import com.achesnovitskiy.octocattest2.ui.repoinfo.di.DaggerRepoInfoComponent
@@ -36,9 +37,7 @@ class RepoInfoFragment : Fragment(R.layout.fragment_repo_info) {
             .inject(this)
     }
 
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
-
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         repo_info_back_button.setOnClickListener { requireActivity().onBackPressed() }
     }
 

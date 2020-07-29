@@ -21,7 +21,7 @@ interface ReposViewModel {
 
     fun onSearchQuery(query: String?)
 
-    fun onSearchModeChange(isSearchMode: Boolean)
+    fun onSearchToggle(isSearch: Boolean)
 }
 
 class ReposViewModelImpl @Inject constructor(private val repository: Repository) :
@@ -54,7 +54,7 @@ class ReposViewModelImpl @Inject constructor(private val repository: Repository)
 
     init {
         compositeDisposable.add(
-            repository.reposFromDb
+            repository.repos
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe { repos ->
@@ -69,7 +69,7 @@ class ReposViewModelImpl @Inject constructor(private val repository: Repository)
         updateState { it.copy(isLoading = true) }
 
         compositeDisposable.add(
-            repository.refreshDb()
+            repository.refresh()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe {
@@ -82,8 +82,8 @@ class ReposViewModelImpl @Inject constructor(private val repository: Repository)
         searchQueryBehaviorSubject.onNext(query ?: "")
     }
 
-    override fun onSearchModeChange(isSearchMode: Boolean) {
-        updateState { it.copy(isSearch = isSearchMode) }
+    override fun onSearchToggle(isSearch: Boolean) {
+        updateState { it.copy(isSearch = isSearch) }
     }
 
     override fun onCleared() {

@@ -8,9 +8,9 @@ import io.reactivex.Observable
 import javax.inject.Inject
 
 interface Repository {
-    val reposFromDb: Observable<List<Repo>>
+    val repos: Observable<List<Repo>>
 
-    fun refreshDb(): Completable
+    fun refresh(): Completable
 }
 
 class RepositoryImpl @Inject constructor(
@@ -18,10 +18,10 @@ class RepositoryImpl @Inject constructor(
     private val db: Db
 ) : Repository {
 
-    override val reposFromDb: Observable<List<Repo>>
+    override val repos: Observable<List<Repo>>
         get() = db.reposDao.getRepos()
 
-    override fun refreshDb(): Completable = api.getReposByUser(USER_OCTOCAT)
+    override fun refresh(): Completable = api.getReposByUser(USER_OCTOCAT)
         .doAfterSuccess { repos ->
             db.runInTransaction {
                 db.reposDao.clearRepos()
