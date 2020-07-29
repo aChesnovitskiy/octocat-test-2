@@ -105,11 +105,11 @@ class ReposFragment : Fragment(R.layout.fragment_repos) {
 
     private fun setupSearchView() {
         repos_search_button.setOnClickListener {
-            reposViewModel.onSearchToggle(true)
+            reposViewModel.searchToggleObserver.onNext(true)
         }
 
         repos_search_back_button.setOnClickListener {
-            reposViewModel.onSearchToggle(false)
+            reposViewModel.searchToggleObserver.onNext(false)
         }
 
         repos_search_close_button.setOnClickListener {
@@ -120,7 +120,7 @@ class ReposFragment : Fragment(R.layout.fragment_repos) {
             override fun afterTextChanged(text: Editable?) {
                 repos_search_close_button.isEnabled = !text.isNullOrEmpty()
 
-                reposViewModel.onSearchQuery(text.toString())
+                reposViewModel.searchQueryObserver.onNext(text.toString())
             }
 
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
@@ -145,7 +145,7 @@ class ReposFragment : Fragment(R.layout.fragment_repos) {
         }
 
         repos_swipe_refresh_layout.setOnRefreshListener {
-            reposViewModel.onRefresh()
+            reposViewModel.refreshObserver.onNext(Unit)
 
             repos_swipe_refresh_layout.isRefreshing = false
         }

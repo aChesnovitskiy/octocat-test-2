@@ -4,11 +4,13 @@ import androidx.lifecycle.ViewModel
 import com.achesnovitskiy.octocattest2.data.pojo.Repo
 import com.achesnovitskiy.octocattest2.domain.Repository
 import io.reactivex.Observable
+import io.reactivex.Observer
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.functions.BiFunction
 import io.reactivex.schedulers.Schedulers
 import io.reactivex.subjects.BehaviorSubject
+import io.reactivex.subjects.PublishSubject
 import javax.inject.Inject
 
 interface ReposViewModel {
@@ -17,11 +19,11 @@ interface ReposViewModel {
 
     val reposStateObservable: Observable<ReposState>
 
-    fun onRefresh()
+    val refreshObserver: Observer<Unit>
 
-    fun onSearchQuery(query: String?)
+    val searchQueryObserver: Observer<String?>
 
-    fun onSearchToggle(isSearch: Boolean)
+    val searchToggleObserver: Observer<Boolean>
 }
 
 class ReposViewModelImpl @Inject constructor(private val repository: Repository) :
@@ -52,42 +54,52 @@ class ReposViewModelImpl @Inject constructor(private val repository: Repository)
             )
         )
 
+    override val refreshObserver: PublishSubject<Unit> = PublishSubject.create()
+
+    override val searchQueryObserver: PublishSubject<String?> = PublishSubject.create()
+
+    override val searchToggleObserver: PublishSubject<Boolean> = PublishSubject.create()
+
     init {
-        compositeDisposable.add(
-            repository.repos
+        compositeDisposable.addAll(
+            repository.reposObservable
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe { repos ->
                     reposBehaviorSubject.onNext(repos)
+                },
+            refreshObserver
+                .subscribe {
+                    refreshRepos()
+                },
+            searchQueryObserver
+                .subscribe { query ->
+                    searchQueryBehaviorSubject.onNext(query ?: "")
+                },
+            searchToggleObserver
+                .subscribe { isSearch ->
+                    updateState { it.copy(isSearch = isSearch) }
                 }
         )
 
-        onRefresh()
+        refreshObserver.onNext(Unit)
     }
 
-    override fun onRefresh() {
+    override fun onCleared() {
+        if (compositeDisposable.size() > 0) compositeDisposable.dispose()
+    }
+
+    private fun refreshRepos() {
         updateState { it.copy(isLoading = true) }
 
         compositeDisposable.add(
-            repository.refresh()
+            repository.refreshRepos()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe {
                     updateState { it.copy(isLoading = false) }
                 }
         )
-    }
-
-    override fun onSearchQuery(query: String?) {
-        searchQueryBehaviorSubject.onNext(query ?: "")
-    }
-
-    override fun onSearchToggle(isSearch: Boolean) {
-        updateState { it.copy(isSearch = isSearch) }
-    }
-
-    override fun onCleared() {
-        if (compositeDisposable.size() > 0) compositeDisposable.dispose()
     }
 
     private fun updateState(update: (currentState: ReposState) -> ReposState) {
