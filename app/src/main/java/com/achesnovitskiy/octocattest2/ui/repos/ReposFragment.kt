@@ -14,7 +14,6 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.achesnovitskiy.octocattest2.R
 import com.achesnovitskiy.octocattest2.app.App.Companion.appComponent
-import com.achesnovitskiy.octocattest2.data.pojo.Repo
 import com.achesnovitskiy.octocattest2.extensions.hideKeyboard
 import com.achesnovitskiy.octocattest2.extensions.showKeyboard
 import com.achesnovitskiy.octocattest2.ui.base.BaseFragment
@@ -32,7 +31,12 @@ class ReposFragment : BaseFragment(R.layout.fragment_repos) {
     lateinit var reposViewModel: ReposViewModel
 
     private val reposAdapter: ReposAdapter by lazy(LazyThreadSafetyMode.NONE) {
-        ReposAdapter { repo -> navigateToInfo(repo) }
+        ReposAdapter { repo ->
+            this.findNavController()
+                .navigate(
+                    ReposFragmentDirections.actionRepositoriesFragmentToRepoInfoFragment(repo.name)
+                )
+        }
     }
 
     override fun onAttach(context: Context) {
@@ -49,32 +53,8 @@ class ReposFragment : BaseFragment(R.layout.fragment_repos) {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        setProgressBarColorForPreLollipop()
-        setupSearchView()
-        setupRecyclerView()
-    }
-
-    override fun onResume() {
-        super.onResume()
-
-        disposable = CompositeDisposable(
-            reposViewModel.reposStateObservable
-                .subscribe(::bindState),
-            reposViewModel.reposWithSearchObservable
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe { repos ->
-                    repos_list_is_empty_text_view.isVisible = repos.isNullOrEmpty()
-
-                    reposAdapter.submitList(repos.sortedBy { it.name })
-                }
-        )
-    }
-
-    /**
-     * Set progress bar color for pre-lollipop devices
-     */
-    private fun setProgressBarColorForPreLollipop() {
+        // START
+        // Set progress bar color for pre-lollipop devices
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
             val drawableProgress =
                 DrawableCompat.wrap(repos_progress_bar.indeterminateDrawable)
@@ -86,9 +66,29 @@ class ReposFragment : BaseFragment(R.layout.fragment_repos) {
 
             repos_progress_bar.indeterminateDrawable = DrawableCompat.unwrap(drawableProgress)
         }
-    }
+        // END
 
-    private fun setupSearchView() {
+        // START
+        // Setup recycler view
+        val divider = DividerItemDecoration(context, DividerItemDecoration.VERTICAL)
+
+        with(repos_recycler_view) {
+            adapter = reposAdapter
+
+            layoutManager = LinearLayoutManager(context)
+
+            addItemDecoration(divider)
+        }
+
+        repos_swipe_refresh_layout.setOnRefreshListener {
+            reposViewModel.refreshObserver.onNext(Unit)
+
+            repos_swipe_refresh_layout.isRefreshing = false
+        }
+        // END
+
+        // START
+        // Setup search view
         repos_search_button.setOnClickListener {
             reposViewModel.searchToggleObserver.onNext(true)
         }
@@ -116,52 +116,43 @@ class ReposFragment : BaseFragment(R.layout.fragment_repos) {
                 // Do nothing
             }
         })
+        // END
     }
 
-    private fun setupRecyclerView() {
-        val divider = DividerItemDecoration(context, DividerItemDecoration.VERTICAL)
+    override fun onResume() {
+        super.onResume()
 
-        with(repos_recycler_view) {
-            adapter = reposAdapter
+        disposable = CompositeDisposable(
+            reposViewModel.reposStateObservable
+                .subscribe { state ->
+                    repos_progress_bar.isVisible = state.isLoading
 
-            layoutManager = LinearLayoutManager(context)
+                    if (state.isSearch) {
+                        repos_search_layout.isVisible = true
+                        repos_search_button.isVisible = false
+                        repos_title.isVisible = false
 
-            addItemDecoration(divider)
-        }
+                        repos_search_edit_text.requestFocus()
 
-        repos_swipe_refresh_layout.setOnRefreshListener {
-            reposViewModel.refreshObserver.onNext(Unit)
+                        requireActivity().showKeyboard()
+                    } else {
+                        repos_search_layout.isVisible = false
+                        repos_search_button.isVisible = true
+                        repos_title.isVisible = true
 
-            repos_swipe_refresh_layout.isRefreshing = false
-        }
-    }
+                        repos_search_edit_text.text = null
 
-    private fun bindState(state: ReposState) {
-        repos_progress_bar.isVisible = state.isLoading
+                        requireActivity().hideKeyboard()
+                    }
+                },
+            reposViewModel.reposWithSearchObservable
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe { repos ->
+                    repos_list_is_empty_text_view.isVisible = repos.isNullOrEmpty()
 
-        if (state.isSearch) {
-            repos_search_layout.isVisible = true
-            repos_search_button.isVisible = false
-            repos_title.isVisible = false
-
-            repos_search_edit_text.requestFocus()
-
-            requireActivity().showKeyboard()
-        } else {
-            repos_search_layout.isVisible = false
-            repos_search_button.isVisible = true
-            repos_title.isVisible = true
-
-            repos_search_edit_text.text = null
-
-            requireActivity().hideKeyboard()
-        }
-    }
-
-    private fun navigateToInfo(repo: Repo) {
-        this.findNavController()
-            .navigate(
-                ReposFragmentDirections.actionRepositoriesFragmentToRepoInfoFragment(repo.name)
-            )
+                    reposAdapter.submitList(repos.sortedBy { it.name })
+                }
+        )
     }
 }

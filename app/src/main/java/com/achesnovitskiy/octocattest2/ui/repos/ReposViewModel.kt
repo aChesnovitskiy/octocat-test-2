@@ -33,7 +33,7 @@ class ReposViewModelImpl @Inject constructor(private val repository: Repository)
 
     private val searchQueryBehaviorSubject: BehaviorSubject<String> = BehaviorSubject.create()
 
-    private var compositeDisposable = CompositeDisposable()
+    private var compositeDisposable: CompositeDisposable? = null
 
     override val reposWithSearchObservable: Observable<List<Repo>> = Observable
         .combineLatest(
@@ -61,7 +61,7 @@ class ReposViewModelImpl @Inject constructor(private val repository: Repository)
     override val searchToggleObserver: PublishSubject<Boolean> = PublishSubject.create()
 
     init {
-        compositeDisposable.addAll(
+        compositeDisposable = CompositeDisposable(
             repository.reposObservable
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -70,7 +70,16 @@ class ReposViewModelImpl @Inject constructor(private val repository: Repository)
                 },
             refreshObserver
                 .subscribe {
-                    refreshRepos()
+                    updateState { it.copy(isLoading = true) }
+
+                    compositeDisposable?.add(
+                        repository.refreshRepos()
+                            .subscribeOn(Schedulers.io())
+                            .observeOn(AndroidSchedulers.mainThread())
+                            .subscribe {
+                                updateState { it.copy(isLoading = false) }
+                            }
+                    )
                 },
             searchQueryObserver
                 .subscribe { query ->
@@ -86,20 +95,7 @@ class ReposViewModelImpl @Inject constructor(private val repository: Repository)
     }
 
     override fun onCleared() {
-        if (compositeDisposable.size() > 0) compositeDisposable.dispose()
-    }
-
-    private fun refreshRepos() {
-        updateState { it.copy(isLoading = true) }
-
-        compositeDisposable.add(
-            repository.refreshRepos()
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe {
-                    updateState { it.copy(isLoading = false) }
-                }
-        )
+        compositeDisposable?.dispose()
     }
 
     private fun updateState(update: (currentState: ReposState) -> ReposState) {
