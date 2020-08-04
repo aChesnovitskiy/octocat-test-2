@@ -5,8 +5,9 @@ import com.achesnovitskiy.octocattest2.data.pojo.Repo
 import com.achesnovitskiy.octocattest2.domain.Repository
 import io.reactivex.Observable
 import io.reactivex.Observer
-import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.disposables.Disposable
+import io.reactivex.disposables.Disposables
 import io.reactivex.functions.BiFunction
 import io.reactivex.schedulers.Schedulers
 import io.reactivex.subjects.BehaviorSubject
@@ -17,7 +18,9 @@ interface ReposViewModel {
 
     val reposWithSearchObservable: Observable<List<Repo>>
 
-    val reposStateObservable: Observable<ReposState>
+    val reposIsLoadingObservable: Observable<Boolean>
+
+    val reposIsSearchObservable: Observable<Boolean>
 
     val refreshObserver: Observer<Unit>
 
@@ -33,7 +36,7 @@ class ReposViewModelImpl @Inject constructor(private val repository: Repository)
 
     private val searchQueryBehaviorSubject: BehaviorSubject<String> = BehaviorSubject.create()
 
-    private var compositeDisposable: CompositeDisposable? = null
+    private var disposable: Disposable = Disposables.disposed()
 
     override val reposWithSearchObservable: Observable<List<Repo>> = Observable
         .combineLatest(
@@ -46,13 +49,11 @@ class ReposViewModelImpl @Inject constructor(private val repository: Repository)
             }
         )
 
-    override val reposStateObservable: BehaviorSubject<ReposState> =
-        BehaviorSubject.createDefault(
-            ReposState(
-                isSearch = false,
-                isLoading = false
-            )
-        )
+    override val reposIsLoadingObservable: BehaviorSubject<Boolean> =
+        BehaviorSubject.createDefault(false)
+
+    override val reposIsSearchObservable: BehaviorSubject<Boolean> =
+        BehaviorSubject.createDefault(false)
 
     override val refreshObserver: PublishSubject<Unit> = PublishSubject.create()
 
@@ -61,33 +62,28 @@ class ReposViewModelImpl @Inject constructor(private val repository: Repository)
     override val searchToggleObserver: PublishSubject<Boolean> = PublishSubject.create()
 
     init {
-        compositeDisposable = CompositeDisposable(
-            repository.reposObservable
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe { repos ->
-                    reposBehaviorSubject.onNext(repos)
-                },
-            refreshObserver
-                .subscribe {
-                    updateState { it.copy(isLoading = true) }
+        repository.reposObservable
+            .subscribe(reposBehaviorSubject)
 
-                    compositeDisposable?.add(
+        searchQueryObserver
+            .subscribe(searchQueryBehaviorSubject)
+
+        searchToggleObserver
+            .subscribe(reposIsSearchObservable)
+
+        disposable = CompositeDisposable(
+            refreshObserver
+                .subscribe
+                {
+                    reposIsLoadingObservable.onNext(true)
+
+                    (disposable as CompositeDisposable).add(
                         repository.refreshRepos()
                             .subscribeOn(Schedulers.io())
-                            .observeOn(AndroidSchedulers.mainThread())
                             .subscribe {
-                                updateState { it.copy(isLoading = false) }
+                                reposIsLoadingObservable.onNext(false)
                             }
                     )
-                },
-            searchQueryObserver
-                .subscribe { query ->
-                    searchQueryBehaviorSubject.onNext(query)
-                },
-            searchToggleObserver
-                .subscribe { isSearch ->
-                    updateState { it.copy(isSearch = isSearch) }
                 }
         )
 
@@ -95,17 +91,6 @@ class ReposViewModelImpl @Inject constructor(private val repository: Repository)
     }
 
     override fun onCleared() {
-        compositeDisposable?.dispose()
-    }
-
-    private fun updateState(update: (currentState: ReposState) -> ReposState) {
-        val updatedState = update(reposStateObservable.value!!)
-
-        reposStateObservable.onNext(updatedState)
+        disposable.dispose()
     }
 }
-
-data class ReposState(
-    val isSearch: Boolean,
-    val isLoading: Boolean
-)

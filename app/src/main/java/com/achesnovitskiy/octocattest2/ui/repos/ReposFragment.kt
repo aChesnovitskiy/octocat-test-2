@@ -123,14 +123,22 @@ class ReposFragment : BaseFragment(R.layout.fragment_repos) {
         super.onResume()
 
         disposable = CompositeDisposable(
-            reposViewModel.reposStateObservable
-                .subscribe { state ->
-                    repos_progress_bar.isVisible = state.isLoading
-                    repos_search_layout.isVisible = state.isSearch
-                    repos_search_button.isVisible = !state.isSearch
-                    repos_title.isVisible = !state.isSearch
+            reposViewModel.reposIsLoadingObservable
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe { isLoading ->
+                    repos_progress_bar.isVisible = isLoading
+                },
 
-                    if (state.isSearch) {
+            reposViewModel.reposIsSearchObservable
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe { isSearch ->
+                    repos_search_layout.isVisible = isSearch
+                    repos_search_button.isVisible = !isSearch
+                    repos_title.isVisible = !isSearch
+
+                    if (isSearch) {
                         repos_search_edit_text.requestFocus()
 
                         requireActivity().showKeyboard()
@@ -140,6 +148,7 @@ class ReposFragment : BaseFragment(R.layout.fragment_repos) {
                         requireActivity().hideKeyboard()
                     }
                 },
+
             reposViewModel.reposWithSearchObservable
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -151,3 +160,12 @@ class ReposFragment : BaseFragment(R.layout.fragment_repos) {
         )
     }
 }
+// TODO { error ->
+//    Snackbar.make(
+//        requireView(),
+//        "The repository list could not be loaded. " +
+//                "Check your internet connection.",
+//        Snackbar.LENGTH_SHORT
+//    )
+//    Log.e("ReposFragment", "${error.stackTrace}")
+//}
