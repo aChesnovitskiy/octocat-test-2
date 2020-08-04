@@ -1,9 +1,10 @@
 package com.achesnovitskiy.octocattest2.ui.repoinfo.di
 
+import com.achesnovitskiy.octocattest2.ui.di.ViewScope
 import com.achesnovitskiy.octocattest2.ui.repoinfo.RepoInfoFragment
 import dagger.Component
 
-@RepoInfoScope
+@ViewScope
 @Component(modules = [RepoInfoModule::class])
 interface RepoInfoComponent {
 

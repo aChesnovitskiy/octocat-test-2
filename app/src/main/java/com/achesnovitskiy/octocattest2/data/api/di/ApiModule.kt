@@ -13,17 +13,19 @@ import javax.inject.Singleton
 
 @Module
 class ApiModule {
-    private val tLSSocketFactory = TLSSocketFactory()
+    private val tLSSocketFactory: TLSSocketFactory
+        get() = TLSSocketFactory()
 
-    private val okHttpClient: OkHttpClient = OkHttpClient.Builder()
-        .let {
-            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
-                it.sslSocketFactory(tLSSocketFactory, tLSSocketFactory.trustManager!!)
-            } else {
-                it
+    private val okHttpClient: OkHttpClient
+        get() = OkHttpClient.Builder()
+            .let {
+                if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
+                    it.sslSocketFactory(tLSSocketFactory, tLSSocketFactory.trustManager!!)
+                } else {
+                    it
+                }
             }
-        }
-        .build()
+            .build()
 
     private val retrofit: Retrofit = Retrofit.Builder()
         .baseUrl(BASE_URL)

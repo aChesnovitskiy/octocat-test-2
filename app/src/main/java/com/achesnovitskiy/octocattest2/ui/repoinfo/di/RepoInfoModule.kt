@@ -3,6 +3,7 @@ package com.achesnovitskiy.octocattest2.ui.repoinfo.di
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelStoreOwner
+import com.achesnovitskiy.octocattest2.ui.di.ViewScope
 import com.achesnovitskiy.octocattest2.ui.repoinfo.RepoInfoViewModel
 import com.achesnovitskiy.octocattest2.ui.repoinfo.RepoInfoViewModelImpl
 import dagger.Module
@@ -15,7 +16,7 @@ class RepoInfoModule(
 ) {
 
     @Provides
-    @RepoInfoScope
+    @ViewScope
     fun provideRepoInfoViewModel(): RepoInfoViewModel =
         ViewModelProvider(
             viewModelStoreOwner,

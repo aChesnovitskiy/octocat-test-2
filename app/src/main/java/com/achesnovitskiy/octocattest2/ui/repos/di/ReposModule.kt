@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelStoreOwner
 import com.achesnovitskiy.octocattest2.domain.Repository
+import com.achesnovitskiy.octocattest2.ui.di.ViewScope
 import com.achesnovitskiy.octocattest2.ui.repos.ReposViewModel
 import com.achesnovitskiy.octocattest2.ui.repos.ReposViewModelImpl
 import dagger.Module
@@ -15,7 +16,7 @@ class ReposModule(
 ) {
 
     @Provides
-    @ReposScope
+    @ViewScope
     fun provideReposViewModel(repository: Repository): ReposViewModel =
         ViewModelProvider(
             viewModelStoreOwner,

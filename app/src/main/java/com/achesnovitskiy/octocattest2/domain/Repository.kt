@@ -13,6 +13,8 @@ interface Repository {
     fun refreshRepos(): Completable
 }
 
+private const val USER_OCTOCAT = "octocat"
+
 class RepositoryImpl @Inject constructor(
     private val api: Api,
     private val db: Db
@@ -22,15 +24,11 @@ class RepositoryImpl @Inject constructor(
         get() = db.reposDao.getRepos()
 
     override fun refreshRepos(): Completable = api.getReposByUser(USER_OCTOCAT)
-        .doAfterSuccess { repos ->
+        .doOnSuccess { repos ->
             db.runInTransaction {
                 db.reposDao.clearRepos()
                 db.reposDao.insertRepos(repos)
             }
         }
         .ignoreElement()
-
-    companion object {
-        const val USER_OCTOCAT = "octocat"
-    }
 }

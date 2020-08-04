@@ -126,21 +126,16 @@ class ReposFragment : BaseFragment(R.layout.fragment_repos) {
             reposViewModel.reposStateObservable
                 .subscribe { state ->
                     repos_progress_bar.isVisible = state.isLoading
+                    repos_search_layout.isVisible = state.isSearch
+                    repos_search_button.isVisible = !state.isSearch
+                    repos_title.isVisible = !state.isSearch
 
                     if (state.isSearch) {
-                        repos_search_layout.isVisible = true
-                        repos_search_button.isVisible = false
-                        repos_title.isVisible = false
-
                         repos_search_edit_text.requestFocus()
 
                         requireActivity().showKeyboard()
                     } else {
-                        repos_search_layout.isVisible = false
-                        repos_search_button.isVisible = true
-                        repos_title.isVisible = true
-
-                        repos_search_edit_text.text = null
+                        repos_search_edit_text.setText("")
 
                         requireActivity().hideKeyboard()
                     }

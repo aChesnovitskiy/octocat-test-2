@@ -21,7 +21,7 @@ interface ReposViewModel {
 
     val refreshObserver: Observer<Unit>
 
-    val searchQueryObserver: Observer<String?>
+    val searchQueryObserver: Observer<String>
 
     val searchToggleObserver: Observer<Boolean>
 }
@@ -56,7 +56,7 @@ class ReposViewModelImpl @Inject constructor(private val repository: Repository)
 
     override val refreshObserver: PublishSubject<Unit> = PublishSubject.create()
 
-    override val searchQueryObserver: PublishSubject<String?> = PublishSubject.create()
+    override val searchQueryObserver: PublishSubject<String> = PublishSubject.create()
 
     override val searchToggleObserver: PublishSubject<Boolean> = PublishSubject.create()
 
@@ -83,7 +83,7 @@ class ReposViewModelImpl @Inject constructor(private val repository: Repository)
                 },
             searchQueryObserver
                 .subscribe { query ->
-                    searchQueryBehaviorSubject.onNext(query ?: "")
+                    searchQueryBehaviorSubject.onNext(query)
                 },
             searchToggleObserver
                 .subscribe { isSearch ->

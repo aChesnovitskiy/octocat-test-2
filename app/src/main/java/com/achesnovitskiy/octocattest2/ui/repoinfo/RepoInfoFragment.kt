@@ -15,9 +15,8 @@ class RepoInfoFragment : BaseFragment(R.layout.fragment_repo_info) {
     @Inject
     lateinit var repoInfoViewModel: RepoInfoViewModel
 
-    private val repoName: String by lazy(LazyThreadSafetyMode.NONE) {
-        arguments?.get("repo_name") as String
-    }
+    private val repoName: String
+        get() = arguments?.get("repo_name") as String
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
