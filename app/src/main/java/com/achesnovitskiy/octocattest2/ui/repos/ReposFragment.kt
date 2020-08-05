@@ -19,6 +19,7 @@ import com.achesnovitskiy.octocattest2.extensions.showKeyboard
 import com.achesnovitskiy.octocattest2.ui.base.BaseFragment
 import com.achesnovitskiy.octocattest2.ui.repos.di.DaggerReposComponent
 import com.achesnovitskiy.octocattest2.ui.repos.di.ReposModule
+import com.google.android.material.snackbar.Snackbar
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
@@ -149,6 +150,19 @@ class ReposFragment : BaseFragment(R.layout.fragment_repos) {
                     }
                 },
 
+            reposViewModel.reposUpdateErrorObservable
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe { isError ->
+                    if (isError) {
+                        Snackbar.make(
+                            requireView(),
+                            getString(R.string.repos_update_error_message),
+                            Snackbar.LENGTH_SHORT
+                        ).show()
+                    }
+                },
+
             reposViewModel.reposWithSearchObservable
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -160,12 +174,3 @@ class ReposFragment : BaseFragment(R.layout.fragment_repos) {
         )
     }
 }
-// TODO { error ->
-//    Snackbar.make(
-//        requireView(),
-//        "The repository list could not be loaded. " +
-//                "Check your internet connection.",
-//        Snackbar.LENGTH_SHORT
-//    )
-//    Log.e("ReposFragment", "${error.stackTrace}")
-//}

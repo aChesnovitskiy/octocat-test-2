@@ -4,5 +4,7 @@
     <string name="list_is_empty">List is Empty</string>
     <string name="search_button">Search Button</string>
     <string name="back_button">Back Button</string>
+    <string name="repos_update_error_message">The repository list could not be updated.
+        Check your internet connection.</string>
 
 </resources>

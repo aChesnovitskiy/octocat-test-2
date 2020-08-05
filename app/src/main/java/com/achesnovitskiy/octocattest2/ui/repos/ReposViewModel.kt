@@ -22,6 +22,8 @@ interface ReposViewModel {
 
     val reposIsSearchObservable: Observable<Boolean>
 
+    val reposUpdateErrorObservable: Observable<Boolean>
+
     val refreshObserver: Observer<Unit>
 
     val searchQueryObserver: Observer<String>
@@ -55,6 +57,8 @@ class ReposViewModelImpl @Inject constructor(private val repository: Repository)
     override val reposIsSearchObservable: BehaviorSubject<Boolean> =
         BehaviorSubject.createDefault(false)
 
+    override val reposUpdateErrorObservable: BehaviorSubject<Boolean> = BehaviorSubject.create()
+
     override val refreshObserver: PublishSubject<Unit> = PublishSubject.create()
 
     override val searchQueryObserver: PublishSubject<String> = PublishSubject.create()
@@ -80,9 +84,18 @@ class ReposViewModelImpl @Inject constructor(private val repository: Repository)
                     (disposable as CompositeDisposable).add(
                         repository.refreshRepos()
                             .subscribeOn(Schedulers.io())
-                            .subscribe {
-                                reposIsLoadingObservable.onNext(false)
-                            }
+                            .subscribe(
+                                {
+                                    reposIsLoadingObservable.onNext(false)
+
+                                    reposUpdateErrorObservable.onNext(false)
+                                },
+                                {
+                                    reposIsLoadingObservable.onNext(false)
+
+                                    reposUpdateErrorObservable.onNext(true)
+                                }
+                            )
                     )
                 }
         )
