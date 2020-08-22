@@ -3,8 +3,10 @@ package com.achesnovitskiy.octocattest2.ui.repos
 import android.content.Context
 import android.os.Build
 import android.os.Bundle
+import android.os.Handler
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.Log
 import android.view.View
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.DrawableCompat
@@ -20,6 +22,7 @@ import com.achesnovitskiy.octocattest2.ui.base.BaseFragment
 import com.achesnovitskiy.octocattest2.ui.repos.di.DaggerReposComponent
 import com.achesnovitskiy.octocattest2.ui.repos.di.ReposModule
 import com.google.android.material.snackbar.Snackbar
+import io.reactivex.ObservableSource
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
@@ -124,13 +127,6 @@ class ReposFragment : BaseFragment(R.layout.fragment_repos) {
         super.onResume()
 
         disposable = CompositeDisposable(
-            reposViewModel.reposIsLoadingObservable
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe { isLoading ->
-                    repos_progress_bar.isVisible = isLoading
-                },
-
             reposViewModel.reposIsSearchObservable
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -150,19 +146,6 @@ class ReposFragment : BaseFragment(R.layout.fragment_repos) {
                     }
                 },
 
-            reposViewModel.reposUpdateErrorObservable
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe { isError ->
-                    if (isError) {
-                        Snackbar.make(
-                            requireView(),
-                            getString(R.string.repos_update_error_message),
-                            Snackbar.LENGTH_SHORT
-                        ).show()
-                    }
-                },
-
             reposViewModel.reposWithSearchObservable
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -170,7 +153,39 @@ class ReposFragment : BaseFragment(R.layout.fragment_repos) {
                     repos_list_is_empty_text_view.isVisible = repos.isNullOrEmpty()
 
                     reposAdapter.submitList(repos.sortedBy { it.name })
+                },
+
+            reposViewModel.refreshObservable
+                .observeOn(AndroidSchedulers.mainThread())
+                .map { repos_progress_bar.isVisible = true }
+                .doOnNext {
+                    Handler().postDelayed(
+                        {
+                            repos_progress_bar.isVisible = false
+                        },
+                        300L
+                    )
+
+                    Log.d("My_ReposFragment", "Refresh complete")
                 }
+                .doOnError {
+                    Snackbar.make(
+                        requireView(),
+                        getString(R.string.repos_update_error_message),
+                        Snackbar.LENGTH_SHORT
+                    ).show()
+
+                    Log.d("My_ReposFragment", "Error: $it")
+                }
+                .retryWhen {
+                    it.flatMap {
+                        reposViewModel.refreshObserver as ObservableSource<*>
+                    }
+                }
+                .subscribe(
+                    { },
+                    { }
+                )
         )
     }
 }

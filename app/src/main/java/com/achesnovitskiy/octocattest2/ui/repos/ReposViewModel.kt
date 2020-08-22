@@ -5,11 +5,7 @@ import com.achesnovitskiy.octocattest2.data.pojo.Repo
 import com.achesnovitskiy.octocattest2.domain.Repository
 import io.reactivex.Observable
 import io.reactivex.Observer
-import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.disposables.Disposable
-import io.reactivex.disposables.Disposables
 import io.reactivex.functions.BiFunction
-import io.reactivex.schedulers.Schedulers
 import io.reactivex.subjects.BehaviorSubject
 import io.reactivex.subjects.PublishSubject
 import javax.inject.Inject
@@ -18,11 +14,9 @@ interface ReposViewModel {
 
     val reposWithSearchObservable: Observable<List<Repo>>
 
-    val reposIsLoadingObservable: Observable<Boolean>
-
     val reposIsSearchObservable: Observable<Boolean>
 
-    val reposUpdateErrorObservable: Observable<Boolean>
+    val refreshObservable: Observable<Unit>
 
     val refreshObserver: Observer<Unit>
 
@@ -38,8 +32,6 @@ class ReposViewModelImpl @Inject constructor(private val repository: Repository)
 
     private val searchQueryBehaviorSubject: BehaviorSubject<String> = BehaviorSubject.create()
 
-    private var disposable: Disposable = Disposables.disposed()
-
     override val reposWithSearchObservable: Observable<List<Repo>> = Observable
         .combineLatest(
             reposBehaviorSubject,
@@ -51,13 +43,10 @@ class ReposViewModelImpl @Inject constructor(private val repository: Repository)
             }
         )
 
-    override val reposIsLoadingObservable: BehaviorSubject<Boolean> =
-        BehaviorSubject.createDefault(false)
-
     override val reposIsSearchObservable: BehaviorSubject<Boolean> =
         BehaviorSubject.createDefault(false)
 
-    override val reposUpdateErrorObservable: BehaviorSubject<Boolean> = BehaviorSubject.create()
+    override val refreshObservable: PublishSubject<Unit> = PublishSubject.create()
 
     override val refreshObserver: PublishSubject<Unit> = PublishSubject.create()
 
@@ -75,35 +64,12 @@ class ReposViewModelImpl @Inject constructor(private val repository: Repository)
         searchToggleObserver
             .subscribe(reposIsSearchObservable)
 
-        disposable = CompositeDisposable(
-            refreshObserver
-                .subscribe
-                {
-                    reposIsLoadingObservable.onNext(true)
-
-                    (disposable as CompositeDisposable).add(
-                        repository.refreshRepos()
-                            .subscribeOn(Schedulers.io())
-                            .subscribe(
-                                {
-                                    reposIsLoadingObservable.onNext(false)
-
-                                    reposUpdateErrorObservable.onNext(false)
-                                },
-                                {
-                                    reposIsLoadingObservable.onNext(false)
-
-                                    reposUpdateErrorObservable.onNext(true)
-                                }
-                            )
-                    )
-                }
-        )
+        refreshObserver
+            .flatMap {
+                repository.refreshObservable
+            }
+            .subscribe(refreshObservable)
 
         refreshObserver.onNext(Unit)
-    }
-
-    override fun onCleared() {
-        disposable.dispose()
     }
 }
