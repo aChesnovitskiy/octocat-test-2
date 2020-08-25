@@ -5,7 +5,6 @@ import android.os.Build
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
-import android.util.Log
 import android.view.View
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.DrawableCompat
@@ -23,7 +22,6 @@ import com.achesnovitskiy.octocattest2.ui.repos.di.ReposModule
 import com.google.android.material.snackbar.Snackbar
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.fragment_repos.*
 import javax.inject.Inject
 
@@ -41,13 +39,9 @@ class ReposFragment : BaseFragment(R.layout.fragment_repos) {
         }
     }
 
-    private val snackbar: Snackbar by lazy(LazyThreadSafetyMode.NONE) {
-        Snackbar.make(
-            requireView(),
-            "",
-            Snackbar.LENGTH_SHORT
-        )
-    }
+    private lateinit var snackbar: Snackbar
+
+    private var isSnackbarInitialized: Boolean = false
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -158,34 +152,28 @@ class ReposFragment : BaseFragment(R.layout.fragment_repos) {
 
             reposViewModel.loadingStateObservable
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe{ loadingState ->
+                .subscribe { loadingState ->
                     repos_progress_bar.isVisible = loadingState.isLoading
 
-                    Log.d("My_ReposFragment", "$loadingState")
-
-//                    if (loadingState.errorRes != null) {
-//                        snackbar
-//                            .setText(loadingState.errorRes)
-//                            .setDuration(Snackbar.LENGTH_INDEFINITE)
-//                            .setAction(getString(R.string.repeat)) {
-//                                reposViewModel.refreshObserver.onNext(Unit)
-//                            }
-//                            .show()
-//
-//                        Log.d("My_ReposFragment", "Show snackbar")
-//                    } else {
-//                        if (snackbar.isShown) {
-//                            snackbar.dismiss()
-//
-//                            Log.d("My_ReposFragment", "Hide snackbar")
-//                        }
-//                    }
-                    loadingState.errorRes?.let {
-                        Snackbar.make(
+                    if (loadingState.errorRes != null) {
+                        snackbar = Snackbar.make(
                             requireView(),
-                            getString(it),
-                            Snackbar.LENGTH_LONG
-                        ).show()
+                            getString(loadingState.errorRes),
+                            Snackbar.LENGTH_INDEFINITE
+                        ).apply {
+                            setAction(getString(R.string.repeat)) {
+                                reposViewModel.refreshObserver.onNext(Unit)
+                            }
+                            show()
+                        }
+
+                        isSnackbarInitialized = true
+                    } else {
+                        if (isSnackbarInitialized && !loadingState.isLoading) {
+                            snackbar.dismiss()
+
+                            isSnackbarInitialized = false
+                        }
                     }
                 }
         )

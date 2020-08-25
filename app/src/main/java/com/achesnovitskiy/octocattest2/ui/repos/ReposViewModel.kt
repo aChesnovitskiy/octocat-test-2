@@ -38,7 +38,8 @@ class ReposViewModelImpl @Inject constructor(private val repository: Repository)
     private val reposIsSearchBehaviorSubject: BehaviorSubject<Boolean> =
         BehaviorSubject.createDefault(false)
 
-    private val loadingStatePublishSubject: PublishSubject<LoadingState> = PublishSubject.create()
+    private val loadingStateBehaviorSubject: BehaviorSubject<LoadingState> =
+        BehaviorSubject.create()
 
     override val reposWithSearchObservable: Observable<List<Repo>>
         get() = Observable
@@ -56,7 +57,7 @@ class ReposViewModelImpl @Inject constructor(private val repository: Repository)
         get() = reposIsSearchBehaviorSubject
 
     override val loadingStateObservable: Observable<LoadingState>
-        get() = loadingStatePublishSubject
+        get() = loadingStateBehaviorSubject
 
     override val refreshObserver: PublishSubject<Unit> = PublishSubject.create()
 
@@ -102,7 +103,7 @@ class ReposViewModelImpl @Inject constructor(private val repository: Repository)
                     )
             }
             .subscribeOn(Schedulers.io())
-            .subscribe(loadingStatePublishSubject)
+            .subscribe(loadingStateBehaviorSubject)
 
         refreshObserver.onNext(Unit)
     }
