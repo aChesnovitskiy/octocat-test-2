@@ -32,6 +32,12 @@ class ReposFragment : BaseFragment(R.layout.fragment_repos) {
 
     private val reposAdapter: ReposAdapter by lazy(LazyThreadSafetyMode.NONE) {
         ReposAdapter { repo ->
+            if (isSnackbarInitialized) {
+                snackbar.dismiss()
+
+                isSnackbarInitialized = false
+            }
+
             this.findNavController()
                 .navigate(
                     ReposFragmentDirections.actionRepositoriesFragmentToRepoInfoFragment(repo.name)
@@ -169,7 +175,7 @@ class ReposFragment : BaseFragment(R.layout.fragment_repos) {
 
                         isSnackbarInitialized = true
                     } else {
-                        if (isSnackbarInitialized && !loadingState.isLoading) {
+                        if (isSnackbarInitialized) {
                             snackbar.dismiss()
 
                             isSnackbarInitialized = false
