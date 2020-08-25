@@ -1,5 +1,6 @@
 package com.achesnovitskiy.octocattest2.ui.repos
 
+import android.os.Handler
 import androidx.annotation.StringRes
 import androidx.lifecycle.ViewModel
 import com.achesnovitskiy.octocattest2.R
@@ -105,7 +106,13 @@ class ReposViewModelImpl @Inject constructor(private val repository: Repository)
             .subscribeOn(Schedulers.io())
             .subscribe(loadingStateBehaviorSubject)
 
-        refreshObserver.onNext(Unit)
+        // Without Handler().postDelayed no update occurs at startup of the fragment
+        Handler().postDelayed(
+            {
+                refreshObserver.onNext(Unit)
+            },
+            100L
+        )
     }
 }
 
