@@ -3,7 +3,6 @@ package com.achesnovitskiy.octocattest2.ui.repos
 import android.content.Context
 import android.os.Build
 import android.os.Bundle
-import android.os.Handler
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
@@ -22,7 +21,6 @@ import com.achesnovitskiy.octocattest2.ui.base.BaseFragment
 import com.achesnovitskiy.octocattest2.ui.repos.di.DaggerReposComponent
 import com.achesnovitskiy.octocattest2.ui.repos.di.ReposModule
 import com.google.android.material.snackbar.Snackbar
-import io.reactivex.ObservableSource
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
@@ -43,6 +41,14 @@ class ReposFragment : BaseFragment(R.layout.fragment_repos) {
         }
     }
 
+    private val snackbar: Snackbar by lazy(LazyThreadSafetyMode.NONE) {
+        Snackbar.make(
+            requireView(),
+            "",
+            Snackbar.LENGTH_SHORT
+        )
+    }
+
     override fun onAttach(context: Context) {
         super.onAttach(context)
 
@@ -57,8 +63,7 @@ class ReposFragment : BaseFragment(R.layout.fragment_repos) {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        // START
-        // Set progress bar color for pre-lollipop devices
+        // START Set progress bar color for pre-lollipop devices
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
             val drawableProgress =
                 DrawableCompat.wrap(repos_progress_bar.indeterminateDrawable)
@@ -72,8 +77,7 @@ class ReposFragment : BaseFragment(R.layout.fragment_repos) {
         }
         // END
 
-        // START
-        // Setup recycler view
+        // START Setup recycler view
         val divider = DividerItemDecoration(context, DividerItemDecoration.VERTICAL)
 
         with(repos_recycler_view) {
@@ -91,8 +95,7 @@ class ReposFragment : BaseFragment(R.layout.fragment_repos) {
         }
         // END
 
-        // START
-        // Setup search view
+        // START Setup search view
         repos_search_button.setOnClickListener {
             reposViewModel.searchToggleObserver.onNext(true)
         }
@@ -128,7 +131,6 @@ class ReposFragment : BaseFragment(R.layout.fragment_repos) {
 
         disposable = CompositeDisposable(
             reposViewModel.reposIsSearchObservable
-                .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe { isSearch ->
                     repos_search_layout.isVisible = isSearch
@@ -155,37 +157,39 @@ class ReposFragment : BaseFragment(R.layout.fragment_repos) {
                     reposAdapter.submitList(repos.sortedBy { it.name })
                 },
 
-            reposViewModel.refreshObservable
+            reposViewModel.loadingStateObservable
+                .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .map { repos_progress_bar.isVisible = true }
-                .doOnNext {
-                    Handler().postDelayed(
-                        {
-                            repos_progress_bar.isVisible = false
-                        },
-                        300L
-                    )
+                .subscribe{ loadingState ->
+                    repos_progress_bar.isVisible = loadingState.isLoading
 
-                    Log.d("My_ReposFragment", "Refresh complete")
-                }
-                .doOnError {
-                    Snackbar.make(
-                        requireView(),
-                        getString(R.string.repos_update_error_message),
-                        Snackbar.LENGTH_SHORT
-                    ).show()
+                    Log.d("My_ReposFragment", "$loadingState")
 
-                    Log.d("My_ReposFragment", "Error: $it")
-                }
-                .retryWhen {
-                    it.flatMap {
-                        reposViewModel.refreshObserver as ObservableSource<*>
+//                    if (loadingState.errorRes != null) {
+//                        snackbar
+//                            .setText(loadingState.errorRes)
+//                            .setDuration(Snackbar.LENGTH_INDEFINITE)
+//                            .setAction(getString(R.string.repeat)) {
+//                                reposViewModel.refreshObserver.onNext(Unit)
+//                            }
+//                            .show()
+//
+//                        Log.d("My_ReposFragment", "Show snackbar")
+//                    } else {
+//                        if (snackbar.isShown) {
+//                            snackbar.dismiss()
+//
+//                            Log.d("My_ReposFragment", "Hide snackbar")
+//                        }
+//                    }
+                    loadingState.errorRes?.let {
+                        Snackbar.make(
+                            requireView(),
+                            getString(it),
+                            Snackbar.LENGTH_LONG
+                        ).show()
                     }
                 }
-                .subscribe(
-                    { },
-                    { }
-                )
         )
     }
 }

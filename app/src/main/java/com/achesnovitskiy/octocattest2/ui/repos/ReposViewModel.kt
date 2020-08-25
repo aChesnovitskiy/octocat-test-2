@@ -1,6 +1,8 @@
 package com.achesnovitskiy.octocattest2.ui.repos
 
+import androidx.annotation.StringRes
 import androidx.lifecycle.ViewModel
+import com.achesnovitskiy.octocattest2.R
 import com.achesnovitskiy.octocattest2.data.pojo.Repo
 import com.achesnovitskiy.octocattest2.domain.Repository
 import io.reactivex.Observable
@@ -16,7 +18,7 @@ interface ReposViewModel {
 
     val reposIsSearchObservable: Observable<Boolean>
 
-    val refreshObservable: Observable<Unit>
+    val loadingStateObservable: Observable<LoadingState>
 
     val refreshObserver: Observer<Unit>
 
@@ -32,21 +34,29 @@ class ReposViewModelImpl @Inject constructor(private val repository: Repository)
 
     private val searchQueryBehaviorSubject: BehaviorSubject<String> = BehaviorSubject.create()
 
-    override val reposWithSearchObservable: Observable<List<Repo>> = Observable
-        .combineLatest(
-            reposBehaviorSubject,
-            searchQueryBehaviorSubject,
-            BiFunction { repos: List<Repo>, searchQuery: String ->
-                repos.filter { repo ->
-                    repo.name.contains(searchQuery, true)
-                }
-            }
-        )
-
-    override val reposIsSearchObservable: BehaviorSubject<Boolean> =
+    private val reposIsSearchBehaviorSubject: BehaviorSubject<Boolean> =
         BehaviorSubject.createDefault(false)
 
-    override val refreshObservable: PublishSubject<Unit> = PublishSubject.create()
+    private val loadingStateBehaviorSubject: BehaviorSubject<LoadingState> =
+        BehaviorSubject.create()
+
+    override val reposWithSearchObservable: Observable<List<Repo>>
+        get() = Observable
+            .combineLatest(
+                reposBehaviorSubject,
+                searchQueryBehaviorSubject,
+                BiFunction { repos: List<Repo>, searchQuery: String ->
+                    repos.filter { repo ->
+                        repo.name.contains(searchQuery, true)
+                    }
+                }
+            )
+
+    override val reposIsSearchObservable: Observable<Boolean>
+        get() = reposIsSearchBehaviorSubject
+
+    override val loadingStateObservable: Observable<LoadingState>
+        get() = loadingStateBehaviorSubject
 
     override val refreshObserver: PublishSubject<Unit> = PublishSubject.create()
 
@@ -62,14 +72,39 @@ class ReposViewModelImpl @Inject constructor(private val repository: Repository)
             .subscribe(searchQueryBehaviorSubject)
 
         searchToggleObserver
-            .subscribe(reposIsSearchObservable)
+            .subscribe(reposIsSearchBehaviorSubject)
 
         refreshObserver
-            .flatMap {
-                repository.refreshObservable
+            .switchMap {
+                repository.refreshCompletable
+                    .andThen(
+                        Observable.just(
+                            LoadingState(
+                                isLoading = false,
+                                errorRes = null
+                            )
+                        )
+                    )
+                    .startWith(
+                        LoadingState(
+                            isLoading = true,
+                            errorRes = null
+                        )
+                    )
+                    .onErrorReturnItem(
+                        LoadingState(
+                            isLoading = false,
+                            errorRes = R.string.repos_update_error_message
+                        )
+                    )
             }
-            .subscribe(refreshObservable)
+            .subscribe(loadingStateBehaviorSubject)
 
         refreshObserver.onNext(Unit)
     }
 }
+
+data class LoadingState(
+    val isLoading: Boolean,
+    @StringRes val errorRes: Int?
+)
