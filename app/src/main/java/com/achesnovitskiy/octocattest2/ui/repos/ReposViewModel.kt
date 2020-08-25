@@ -8,6 +8,7 @@ import com.achesnovitskiy.octocattest2.domain.Repository
 import io.reactivex.Observable
 import io.reactivex.Observer
 import io.reactivex.functions.BiFunction
+import io.reactivex.schedulers.Schedulers
 import io.reactivex.subjects.BehaviorSubject
 import io.reactivex.subjects.PublishSubject
 import javax.inject.Inject
@@ -37,8 +38,7 @@ class ReposViewModelImpl @Inject constructor(private val repository: Repository)
     private val reposIsSearchBehaviorSubject: BehaviorSubject<Boolean> =
         BehaviorSubject.createDefault(false)
 
-    private val loadingStateBehaviorSubject: BehaviorSubject<LoadingState> =
-        BehaviorSubject.create()
+    private val loadingStatePublishSubject: PublishSubject<LoadingState> = PublishSubject.create()
 
     override val reposWithSearchObservable: Observable<List<Repo>>
         get() = Observable
@@ -56,7 +56,7 @@ class ReposViewModelImpl @Inject constructor(private val repository: Repository)
         get() = reposIsSearchBehaviorSubject
 
     override val loadingStateObservable: Observable<LoadingState>
-        get() = loadingStateBehaviorSubject
+        get() = loadingStatePublishSubject
 
     override val refreshObserver: PublishSubject<Unit> = PublishSubject.create()
 
@@ -66,12 +66,15 @@ class ReposViewModelImpl @Inject constructor(private val repository: Repository)
 
     init {
         repository.reposObservable
+            .subscribeOn(Schedulers.io())
             .subscribe(reposBehaviorSubject)
 
         searchQueryObserver
+            .subscribeOn(Schedulers.io())
             .subscribe(searchQueryBehaviorSubject)
 
         searchToggleObserver
+            .subscribeOn(Schedulers.io())
             .subscribe(reposIsSearchBehaviorSubject)
 
         refreshObserver
@@ -98,7 +101,8 @@ class ReposViewModelImpl @Inject constructor(private val repository: Repository)
                         )
                     )
             }
-            .subscribe(loadingStateBehaviorSubject)
+            .subscribeOn(Schedulers.io())
+            .subscribe(loadingStatePublishSubject)
 
         refreshObserver.onNext(Unit)
     }

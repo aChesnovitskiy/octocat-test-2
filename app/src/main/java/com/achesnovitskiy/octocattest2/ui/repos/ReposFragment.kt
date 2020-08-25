@@ -149,7 +149,6 @@ class ReposFragment : BaseFragment(R.layout.fragment_repos) {
                 },
 
             reposViewModel.reposWithSearchObservable
-                .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe { repos ->
                     repos_list_is_empty_text_view.isVisible = repos.isNullOrEmpty()
@@ -158,7 +157,6 @@ class ReposFragment : BaseFragment(R.layout.fragment_repos) {
                 },
 
             reposViewModel.loadingStateObservable
-                .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe{ loadingState ->
                     repos_progress_bar.isVisible = loadingState.isLoading
