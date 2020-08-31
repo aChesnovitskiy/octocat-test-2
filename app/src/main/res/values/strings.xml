@@ -1,3 +1,10 @@
 <resources>
     <string name="app_name">Octocat Test 2</string>
+    <string name="search">Search</string>
+    <string name="repeat">Repeat</string>
+    <string name="list_is_empty">List is Empty</string>
+    <string name="search_button">Search Button</string>
+    <string name="back_button">Back Button</string>
+    <string name="repos_update_error_message">Can\'t update the list. Check your internet connection.</string>
+
 </resources>

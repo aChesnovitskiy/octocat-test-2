@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.appcompat.widget.LinearLayoutCompat xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".ui.repos.ReposFragment">
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="@color/color_primary">
+
+        <TextView
+            android:id="@+id/repos_title"
+            style="@style/ToolbarTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center|start"
+            android:layout_marginStart="@dimen/spacing_normal_16"
+            android:text="@string/app_name" />
+
+        <ImageButton
+            android:id="@+id/repos_search_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center|end"
+            android:layout_marginEnd="@dimen/spacing_normal_16"
+            android:background="@drawable/background_ripple"
+            android:contentDescription="@string/search_button"
+            android:src="@drawable/ic_search_white_24" />
+
+        <LinearLayout
+            android:id="@+id/repos_search_layout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginHorizontal="@dimen/spacing_normal_16"
+            android:layout_marginVertical="@dimen/spacing_tiny_4"
+            android:background="@drawable/background_search"
+            android:orientation="horizontal">
+
+            <ImageButton
+                android:id="@+id/repos_search_back_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginStart="@dimen/spacing_normal_16"
+                android:background="@drawable/background_ripple"
+                android:contentDescription="@string/search_button"
+                android:src="@drawable/ic_back_black_24" />
+
+            <EditText
+                android:id="@+id/repos_search_edit_text"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginHorizontal="@dimen/spacing_small_8"
+                android:layout_weight="1"
+                android:background="@null"
+                android:hint="@string/search"
+                android:importantForAutofill="no"
+                android:inputType="text" />
+
+            <ImageButton
+                android:id="@+id/repos_search_close_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginEnd="@dimen/spacing_normal_16"
+                android:background="@drawable/background_ripple"
+                android:contentDescription="@string/search_button"
+                android:src="@drawable/ic_close_24"/>
+
+        </LinearLayout>
+
+    </FrameLayout>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <TextView
+            android:id="@+id/repos_list_is_empty_text_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:text="@string/list_is_empty"
+            android:textSize="@dimen/font_size_large_18" />
+
+        <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+            android:id="@+id/repos_swipe_refresh_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/repos_recycler_view"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                tools:listitem="@layout/item_repo" />
+
+        </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+
+        <androidx.core.widget.ContentLoadingProgressBar
+            android:id="@+id/repos_progress_bar"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:indeterminate="true"
+            android:visibility="gone" />
+
+    </FrameLayout>
+
+</androidx.appcompat.widget.LinearLayoutCompat>
