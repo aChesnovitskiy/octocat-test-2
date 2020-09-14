@@ -49,8 +49,7 @@ class ReposViewModelImpl @Inject constructor(private val repository: Repository)
             .combineLatest(
                 repository.reposObservable
                     .subscribeOn(Schedulers.io()),
-                searchQueryObserver
-                    .subscribeOn(Schedulers.io()),
+                searchQueryObserver,
                 BiFunction { repos: List<Repo>, searchQuery: String ->
                     repos.filter { repo ->
                         repo.name.contains(searchQuery, true)
@@ -77,11 +76,9 @@ class ReposViewModelImpl @Inject constructor(private val repository: Repository)
 
     init {
         onRepoClickObserver
-            .subscribeOn(Schedulers.io())
             .subscribe(onRepoClickPublishSubject)
 
         searchToggleObserver
-            .subscribeOn(Schedulers.io())
             .subscribe(reposIsSearchBehaviorSubject)
 
         refreshObserver
@@ -108,18 +105,9 @@ class ReposViewModelImpl @Inject constructor(private val repository: Repository)
                         )
                     )
             }
-            .subscribeOn(Schedulers.io())
             .subscribe(loadingStateBehaviorSubject)
 
-        onRepoClickObserver
-
-        // Without Handler().postDelayed no update occurs at startup of the fragment
-        Handler().postDelayed(
-            {
-                refreshObserver.onNext(Unit)
-            },
-            100L
-        )
+        refreshObserver.onNext(Unit)
     }
 }
 
