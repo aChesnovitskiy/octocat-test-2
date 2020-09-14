@@ -32,16 +32,7 @@ class ReposFragment : BaseFragment(R.layout.fragment_repos) {
 
     private val reposAdapter: ReposAdapter by lazy(LazyThreadSafetyMode.NONE) {
         ReposAdapter { repo ->
-            if (isSnackbarInitialized) {
-                snackbar.dismiss()
-
-                isSnackbarInitialized = false
-            }
-
-            this.findNavController()
-                .navigate(
-                    ReposFragmentDirections.actionRepositoriesFragmentToRepoInfoFragment(repo.name)
-                )
+            reposViewModel.onRepoClickObserver.onNext(repo.name)
         }
     }
 
@@ -130,6 +121,22 @@ class ReposFragment : BaseFragment(R.layout.fragment_repos) {
         super.onResume()
 
         disposable = CompositeDisposable(
+            reposViewModel.navigateToRepoInfoObservable
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe { repoName ->
+                    if (isSnackbarInitialized) {
+                        snackbar.dismiss()
+
+                        isSnackbarInitialized = false
+                    }
+
+                    this.findNavController()
+                        .navigate(
+                            ReposFragmentDirections
+                                .actionRepositoriesFragmentToRepoInfoFragment(repoName)
+                        )
+                },
+
             reposViewModel.reposIsSearchObservable
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe { isSearch ->

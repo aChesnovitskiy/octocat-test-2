@@ -18,9 +18,13 @@ interface ReposViewModel {
 
     val reposWithSearchObservable: Observable<List<Repo>>
 
+    val navigateToRepoInfoObservable: Observable<String>
+
     val reposIsSearchObservable: Observable<Boolean>
 
     val loadingStateObservable: Observable<LoadingState>
+
+    val onRepoClickObserver: Observer<String>
 
     val refreshObserver: Observer<Unit>
 
@@ -32,9 +36,7 @@ interface ReposViewModel {
 class ReposViewModelImpl @Inject constructor(private val repository: Repository) :
     ViewModel(), ReposViewModel {
 
-    private val reposBehaviorSubject: BehaviorSubject<List<Repo>> = BehaviorSubject.create()
-
-    private val searchQueryBehaviorSubject: BehaviorSubject<String> = BehaviorSubject.create()
+    private val onRepoClickPublishSubject: PublishSubject<String> = PublishSubject.create()
 
     private val reposIsSearchBehaviorSubject: BehaviorSubject<Boolean> =
         BehaviorSubject.createDefault(false)
@@ -45,8 +47,10 @@ class ReposViewModelImpl @Inject constructor(private val repository: Repository)
     override val reposWithSearchObservable: Observable<List<Repo>>
         get() = Observable
             .combineLatest(
-                reposBehaviorSubject,
-                searchQueryBehaviorSubject,
+                repository.reposObservable
+                    .subscribeOn(Schedulers.io()),
+                searchQueryObserver
+                    .subscribeOn(Schedulers.io()),
                 BiFunction { repos: List<Repo>, searchQuery: String ->
                     repos.filter { repo ->
                         repo.name.contains(searchQuery, true)
@@ -54,11 +58,16 @@ class ReposViewModelImpl @Inject constructor(private val repository: Repository)
                 }
             )
 
+    override val navigateToRepoInfoObservable: Observable<String>
+        get() = onRepoClickPublishSubject
+
     override val reposIsSearchObservable: Observable<Boolean>
         get() = reposIsSearchBehaviorSubject
 
     override val loadingStateObservable: Observable<LoadingState>
         get() = loadingStateBehaviorSubject
+
+    override val onRepoClickObserver: PublishSubject<String> = PublishSubject.create()
 
     override val refreshObserver: PublishSubject<Unit> = PublishSubject.create()
 
@@ -67,13 +76,9 @@ class ReposViewModelImpl @Inject constructor(private val repository: Repository)
     override val searchToggleObserver: PublishSubject<Boolean> = PublishSubject.create()
 
     init {
-        repository.reposObservable
+        onRepoClickObserver
             .subscribeOn(Schedulers.io())
-            .subscribe(reposBehaviorSubject)
-
-        searchQueryObserver
-            .subscribeOn(Schedulers.io())
-            .subscribe(searchQueryBehaviorSubject)
+            .subscribe(onRepoClickPublishSubject)
 
         searchToggleObserver
             .subscribeOn(Schedulers.io())
@@ -105,6 +110,8 @@ class ReposViewModelImpl @Inject constructor(private val repository: Repository)
             }
             .subscribeOn(Schedulers.io())
             .subscribe(loadingStateBehaviorSubject)
+
+        onRepoClickObserver
 
         // Without Handler().postDelayed no update occurs at startup of the fragment
         Handler().postDelayed(
